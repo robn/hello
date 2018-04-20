@@ -23,6 +23,21 @@ my $default_timeout  = delete $default_config->{timeout}  // 30;
 
 my $loop = IO::Async::Loop->new;
 
+my @collectors;
+
+for my $collector_package (keys $config->{collector}->%*) {
+  my $collector_config = delete $config->{collector}->{$collector_package} // {};
+
+  load "Hello::Collector::$collector_package";
+
+  my $collector = "Hello::Collector::$collector_package"->new(
+    loop => $loop,
+    %$collector_config,
+  );
+
+  push @collectors, $collector;
+}
+
 my @testers;
 
 for my $tester_package (keys $config->{tester}->%*) {
@@ -58,6 +73,8 @@ Future->wait_all(
           my ($result) = @_;
 
           $Logger->log(["result: %s (%s) [%.2fs]", $result->state, $result->reason, $result->elapsed]);
+
+          $_->collect($result) for @collectors;
 
           my $wait_time = int(.5 + $tester->interval - $result->elapsed);
 
