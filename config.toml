@@ -1,0 +1,39 @@
+[tester._defaults_]
+  interval = 20
+  timeout = 5
+
+[[tester.true]]
+  name = "always succeeds"
+
+[[tester.false]]
+  name = "always fails"
+
+[[tester.sleep]]
+  name = "nap time"
+  sleep = 60
+  timeout = 10
+  interval = 2
+
+[[tester.tcp_connect]]
+  # interval =
+  # timeout =
+  name = "printer"
+  ip = "127.0.0.1"
+  port = 631
+  # expect =
+
+[[tester.tcp_connect]]
+  # interval =
+  # timeout =
+  name = "no printer"
+  ip = "127.0.0.1"
+  port = 632
+  # expect =
+
+[[tester.tcp_connect]]
+  # interval =
+  # timeout =
+  name = "far away"
+  ip = "66.111.4.4"
+  port = 123
+  # expect =
