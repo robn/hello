@@ -82,7 +82,7 @@ Future->wait_all(
             my $now = time;
             my $interval = $tester->interval;
 
-            my $next_time = $result->start;
+            my $next_time = int($result->start);
             my $skipped = 0;
             while ($next_time < $now) {
               $next_time += $interval;
