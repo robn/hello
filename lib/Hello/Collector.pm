@@ -11,4 +11,6 @@ has loop => ( is => 'ro', isa => class_type('IO::Async::Loop'), required => 1 );
 
 requires qw(collect);
 
+sub init { }
+
 1;

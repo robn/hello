@@ -35,6 +35,8 @@ for my $collector_package (keys $config->{collector}->%*) {
     %$collector_config,
   );
 
+  $collector->init;
+
   push @collectors, $collector;
 }
 
