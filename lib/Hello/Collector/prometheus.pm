@@ -99,7 +99,7 @@ sub init {
 sub collect {
   my ($self, $result) = @_;
 
-  my @labels = qw(sometype somename); # XXX
+  my @labels = ($result->type, $result->name);
 
   my $counters = $self->_prom_counters;
   my $gauges = $self->_prom_gauges;

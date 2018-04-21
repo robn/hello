@@ -8,6 +8,9 @@ use Moo;
 use Types::Standard qw(Str Enum Num Bool);
 use Type::Utils qw(role_type);
 
+has type => ( is => 'ro', isa => Str, required => 1 );
+has name => ( is => 'ro', isa => Str, required => 1 );
+
 has state => ( is => 'ro', isa => Enum[qw(SUCCESS FAIL TIMEOUT)], required => 1 );
 
 has reason => ( is => 'ro', isa => Str, default => sub { '' } );

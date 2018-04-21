@@ -36,15 +36,19 @@ sub test_result {
           state   => 'SUCCESS',
           start   => $tv_start->[0] + $tv_start->[1] / 1000,
           elapsed => tv_interval($tv_start),
+          type    => $self->type,
+          name    => $self->name,
         ));
       })
       ->else(sub {
         my ($exception, @details) = @_;
         return Future->done(Hello::Result->new(
-          state => 'FAIL',
-          reason => $exception ,
+          state   => 'FAIL',
+          reason  => $exception ,
           start   => $tv_start->[0] + $tv_start->[1] / 1000,
           elapsed => tv_interval($tv_start),
+          type    => $self->type,
+          name    => $self->name,
         ));
       }),
     $self->loop->timeout_future(after => $self->timeout)
@@ -53,6 +57,8 @@ sub test_result {
           state   => 'TIMEOUT',
           start   => $tv_start->[0] + $tv_start->[1] / 1000,
           elapsed => tv_interval($tv_start),
+          type    => $self->type,
+          name    => $self->name,
         ));
       }),
   )
