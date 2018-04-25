@@ -7,7 +7,7 @@ use experimental qw(postderef);
 
 use IO::Async::Loop;
 use TOML qw(from_toml);
-use Module::Load qw(load);
+use Module::Runtime qw(require_module);
 use Defined::KV;
 use Hello::World;
 
@@ -25,12 +25,13 @@ my $loop = IO::Async::Loop->new;
 
 my @collectors;
 
-for my $collector_package (keys $config->{collector}->%*) {
-  my $collector_config = delete $config->{collector}->{$collector_package} // {};
+for my $collector_type (keys $config->{collector}->%*) {
+  my $collector_config = delete $config->{collector}->{$collector_type} // {};
 
-  load "Hello::Collector::$collector_package";
+  my $collector_package = "Hello::Collector::$collector_type";
+  require_module($collector_package);
 
-  my $collector = "Hello::Collector::$collector_package"->new(
+  my $collector = $collector_package->new(
     loop => $loop,
     %$collector_config,
   );
@@ -42,16 +43,17 @@ for my $collector_package (keys $config->{collector}->%*) {
 
 my @testers;
 
-for my $tester_package (keys $config->{tester}->%*) {
-  my $tester_list = delete $config->{tester}->{$tester_package} // [];
+for my $tester_type (keys $config->{tester}->%*) {
+  my $tester_list = delete $config->{tester}->{$tester_type} // [];
 
-  load "Hello::Tester::$tester_package";
+  my $tester_package = "Hello::Tester::$tester_type";
+  require_module($tester_package);
 
   for my $tester_config ($tester_list->@*) {
     my $tester_interval = delete $tester_config->{interval} // $default_interval;
     my $tester_timeout  = delete $tester_config->{timeout}  // $default_timeout;
 
-    my $tester = "Hello::Tester::$tester_package"->new(
+    my $tester = $tester_package->new(
       loop     => $loop,
       defined_kv(interval => $tester_interval),
       defined_kv(timeout  => $tester_timeout),
