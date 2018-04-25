@@ -4,9 +4,18 @@ use 5.020;
 use warnings;
 use strict;
 
+use Getopt::Long::Descriptive;
 use IO::Async::Loop;
 use Hello::World;
 
+my ($opt, $usage) = describe_options(
+  'hello -c config.toml',
+  [ 'config|c=s', 'config file to load', { required => 1 } ],
+  [ 'help',       'print usage message and exit', { shortcircuit => 1 } ],
+);
+
+print $usage->text and exit if $opt->help;
+
 my $loop = IO::Async::Loop->new;
 
-Hello::World->from_config(loop => $loop, filename => 'config.toml')->go->get;
+Hello::World->from_config(loop => $loop, filename => $opt->config)->go->get;
