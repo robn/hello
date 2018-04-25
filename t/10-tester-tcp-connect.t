@@ -19,8 +19,6 @@ no_pending_futures {
   my $t = Hello::Tester::tcp_connect->new(
     loop     => $loop,
     name     => "tcp_connect",
-    interval => 120,
-    timeout  => 10,
     ip       => "127.0.0.1",
     port     => $port,
   );

@@ -8,6 +8,7 @@ use experimental qw(postderef);
 use IO::Async::Loop;
 use TOML qw(from_toml);
 use Module::Load qw(load);
+use Defined::KV;
 use Hello::World;
 
 my ($config, $err) = from_toml(do { local (@ARGV, $/) = ('config.toml'); <> });
@@ -17,8 +18,8 @@ warn $err unless $config;
 #print Dumper $config;
 
 my $default_config = delete $config->{tester}->{_defaults_} // {};
-my $default_interval = delete $default_config->{interval} // 120;
-my $default_timeout  = delete $default_config->{timeout}  // 30;
+my $default_interval = delete $default_config->{interval};
+my $default_timeout  = delete $default_config->{timeout};
 
 my $loop = IO::Async::Loop->new;
 
@@ -52,8 +53,8 @@ for my $tester_package (keys $config->{tester}->%*) {
 
     my $tester = "Hello::Tester::$tester_package"->new(
       loop     => $loop,
-      interval => $tester_interval,
-      timeout  => $tester_timeout,
+      defined_kv(interval => $tester_interval),
+      defined_kv(timeout  => $tester_timeout),
       %$tester_config,
     );
 

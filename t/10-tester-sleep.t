@@ -15,8 +15,6 @@ my $loop = IO::Async::Loop->new;
 no_pending_futures {
   my $t = Hello::Tester::sleep->new(
     loop     => $loop,
-    interval => 120,
-    timeout  => 10,
     name     => "sleep 5",
     sleep    => 5,
   );

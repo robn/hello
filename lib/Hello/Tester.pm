@@ -17,8 +17,8 @@ has loop => ( is => 'ro', isa => class_type('IO::Async::Loop'), required => 1 );
 
 has name => ( is => 'ro', isa => Str, required => 1 );
 
-has interval => ( is => 'ro', isa => Int, required => 1 );
-has timeout  => ( is => 'ro', isa => Int, required => 1 );
+has interval => ( is => 'ro', isa => Int, default => sub { 120 } );
+has timeout  => ( is => 'ro', isa => Int, default => sub { 30 } );
 
 has type => ( is => 'lazy', isa => Str, default => sub { [ref(shift) =~ m/::([^:]+$)/]->[0] } );
 

@@ -17,8 +17,6 @@ my $loop = IO::Async::Loop->new;
 no_pending_futures {
   my $t = Hello::Tester::true->new(
     loop     => $loop,
-    interval => 120,
-    timeout  => 10,
     name     => "true",
   );
 
@@ -30,8 +28,6 @@ no_pending_futures {
 no_pending_futures {
   my $t = Hello::Tester::false->new(
     loop     => $loop,
-    interval => 120,
-    timeout  => 10,
     name     => "false",
   );
 
@@ -43,10 +39,9 @@ no_pending_futures {
 no_pending_futures {
   my $t = Hello::Tester::sleep->new(
     loop     => $loop,
-    interval => 120,
-    timeout  => 2,
     name     => "sleep 10",
     sleep    => 10,
+    timeout  => 2,
   );
 
   my $r = $t->test_result->get;
