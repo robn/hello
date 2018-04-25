@@ -10,6 +10,7 @@ use TOML qw(from_toml);
 use Module::Runtime qw(require_module);
 use Defined::KV;
 use Hello::World;
+use Hello::Logger '$Logger';
 
 my ($config, $err) = from_toml(do { local (@ARGV, $/) = ('config.toml'); <> });
 warn $err unless $config;
@@ -36,6 +37,8 @@ for my $collector_type (keys $config->{collector}->%*) {
     %$collector_config,
   );
 
+  $Logger->log("created '$collector_type' collector");
+
   $collector->init;
 
   push @collectors, $collector;
@@ -59,6 +62,13 @@ for my $tester_type (keys $config->{tester}->%*) {
       defined_kv(timeout  => $tester_timeout),
       %$tester_config,
     );
+
+    $Logger->log(join('; ',
+      "created '$tester_type' tester",
+      "name: ".$tester->name,
+      "interval: ".$tester->interval,
+      "timeout: ".$tester->timeout,
+    ));
 
     push @testers, $tester;
   }
