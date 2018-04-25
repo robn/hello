@@ -8,8 +8,7 @@ use experimental qw(postderef);
 use IO::Async::Loop;
 use TOML qw(from_toml);
 use Module::Load qw(load);
-use Future::Utils qw(try_repeat);
-use Hello::Logger '$Logger';
+use Hello::World;
 
 my ($config, $err) = from_toml(do { local (@ARGV, $/) = ('config.toml'); <> });
 warn $err unless $config;
@@ -62,47 +61,11 @@ for my $tester_package (keys $config->{tester}->%*) {
   }
 }
 
-Future->wait_all(
-  map {
-    my $tester = $_;
-    try_repeat {
-      my $Logger = $Logger->proxy({ proxy_prefix => $tester->name.': ' });
-
-      $Logger->log("starting");
-
-      $tester->test_result
-        ->then(sub {
-          my ($result) = @_;
-
-          $Logger->log(["result: %s (%s) [%.2fs]", $result->state, $result->reason, $result->elapsed]);
-
-          $_->collect($result) for @collectors;
-
-          my $wait_time = int(.5 + $tester->interval - $result->elapsed);
-
-          if ($wait_time < 0) {
-            my $now = time;
-            my $interval = $tester->interval;
-
-            my $next_time = int($result->start);
-            my $skipped = 0;
-            while ($next_time < $now) {
-              $next_time += $interval;
-              $skipped++;
-            }
-
-            $wait_time = $next_time - $now;
-
-            $Logger->log("WARNING: last run took longer than interval $interval; skipped $skipped tests");
-          }
-
-          $Logger->log(["next run in %ds, at %s", $wait_time, scalar localtime(time() + $wait_time)]);
-
-          $loop->delay_future(after => $wait_time);
-        })
-    } while => sub { 1 };
-  } @testers
-)->get;
+Hello::World->new(
+  loop => $loop,
+  collectors => \@collectors,
+  testers => \@testers,
+)->go->get;
 
 #my @f = map { [$_->get] } Future->wait_all(map { $_->test } @testers)->get;
 #use Data::Dumper;
