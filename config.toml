@@ -41,3 +41,9 @@
   ip = "66.111.4.4"
   port = 123
   # expect =
+
+[[tester.tcp_connect]]
+  name = "vm ssh"
+  ip = "10.211.55.49"
+  port = 22
+  expect = "^SSH-"
