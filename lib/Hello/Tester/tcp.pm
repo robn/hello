@@ -1,4 +1,4 @@
-package Hello::Tester::tcp_connect;
+package Hello::Tester::tcp;
 
 use 5.020;
 use warnings;

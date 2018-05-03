@@ -9,16 +9,16 @@ use Test::Future;
 use IO::Async::Loop;
 use Net::EmptyPort qw(empty_port);
 
-use Hello::Tester::tcp_connect;
+use Hello::Tester::tcp;
 
 my $loop = IO::Async::Loop->new;
 
 no_pending_futures {
   my $port = empty_port;
 
-  my $t = Hello::Tester::tcp_connect->new(
+  my $t = Hello::Tester::tcp->new(
     loop     => $loop,
-    name     => "tcp_connect",
+    name     => "tco",
     ip       => "127.0.0.1",
     port     => $port,
     banner   => "^HELLO",

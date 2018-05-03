@@ -18,7 +18,7 @@
   timeout = 10
   interval = 2
 
-[[tester.tcp_connect]]
+[[tester.tcp]]
   # interval =
   # timeout =
   name = "printer"
@@ -26,7 +26,7 @@
   port = 631
   # banner =
 
-[[tester.tcp_connect]]
+[[tester.tcp]]
   # interval =
   # timeout =
   name = "no printer"
@@ -34,7 +34,7 @@
   port = 632
   # banner =
 
-[[tester.tcp_connect]]
+[[tester.tcp]]
   # interval =
   # timeout =
   name = "far away"
@@ -42,7 +42,7 @@
   port = 123
   # banner =
 
-[[tester.tcp_connect]]
+[[tester.tcp]]
   name = "vm ssh"
   ip = "10.211.55.49"
   port = 22
