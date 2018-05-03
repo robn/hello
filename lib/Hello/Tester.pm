@@ -34,7 +34,7 @@ sub test_result {
       ->then(sub {
         return Future->done(Hello::Result->new(
           state   => 'SUCCESS',
-          start   => $tv_start->[0] + $tv_start->[1] / 1000,
+          start   => $tv_start->[0] + $tv_start->[1] / 1_000_000,
           elapsed => tv_interval($tv_start),
           type    => $self->type,
           name    => $self->name,
@@ -45,7 +45,7 @@ sub test_result {
         return Future->done(Hello::Result->new(
           state   => 'FAIL',
           reason  => $exception ,
-          start   => $tv_start->[0] + $tv_start->[1] / 1000,
+          start   => $tv_start->[0] + $tv_start->[1] / 1_000_000,
           elapsed => tv_interval($tv_start),
           type    => $self->type,
           name    => $self->name,
@@ -55,7 +55,7 @@ sub test_result {
       ->else(sub {
         return Future->done(Hello::Result->new(
           state   => 'TIMEOUT',
-          start   => $tv_start->[0] + $tv_start->[1] / 1000,
+          start   => $tv_start->[0] + $tv_start->[1] / 1_000_000,
           elapsed => tv_interval($tv_start),
           type    => $self->type,
           name    => $self->name,
