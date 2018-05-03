@@ -47,3 +47,11 @@
   ip = "10.211.55.49"
   port = 22
   expect = "^SSH-"
+
+[[tester.http]]
+  name = "printer web"
+  url = "http://localhost:631"
+
+[[tester.http]]
+  name = "printer web 404"
+  url = "http://localhost:631/zub"
