@@ -55,3 +55,11 @@
 [[tester.http]]
   name = "printer web 404"
   url = "http://localhost:631/zub"
+
+[[tester.socket]]
+  name = "mdns responder"
+  path = "/var/run/mDNSResponder"
+
+[[tester.socket]]
+  name = "devnull is not a socket"
+  path = "/dev/null"
