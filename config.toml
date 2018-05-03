@@ -24,7 +24,7 @@
   name = "printer"
   ip = "127.0.0.1"
   port = 631
-  # expect =
+  # banner =
 
 [[tester.tcp_connect]]
   # interval =
@@ -32,7 +32,7 @@
   name = "no printer"
   ip = "127.0.0.1"
   port = 632
-  # expect =
+  # banner =
 
 [[tester.tcp_connect]]
   # interval =
@@ -40,13 +40,13 @@
   name = "far away"
   ip = "66.111.4.4"
   port = 123
-  # expect =
+  # banner =
 
 [[tester.tcp_connect]]
   name = "vm ssh"
   ip = "10.211.55.49"
   port = 22
-  expect = "^SSH-"
+  banner = "^SSH-"
 
 [[tester.http]]
   name = "printer web"

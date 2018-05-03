@@ -21,7 +21,7 @@ no_pending_futures {
     name     => "tcp_connect",
     ip       => "127.0.0.1",
     port     => $port,
-    expect   => "^HELLO",
+    banner   => "^HELLO",
   );
 
   ok($t->test->else_done(1)->get, "connection failed when listener doesn't exist");

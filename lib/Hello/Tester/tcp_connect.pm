@@ -14,7 +14,7 @@ use IO::Async::Stream;
 has ip   => ( is => 'ro', isa => Str, required => 1 );
 has port => ( is => 'ro', isa => Int, required => 1 );
 
-has expect => ( is => 'ro', isa => Str );
+has banner => ( is => 'ro', isa => Str );
 
 sub test {
   my ($self) = @_;
@@ -28,8 +28,8 @@ sub test {
     },
   );
 
-  if ($self->expect) {
-    my $re = $self->expect;
+  if ($self->banner) {
+    my $re = $self->banner;
     $f = $f->then(sub {
       my $h = IO::Async::Stream->new(read_handle => shift, on_read => sub {});
       $self->loop->add($h);
