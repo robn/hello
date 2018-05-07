@@ -18,10 +18,9 @@ no_pending_futures {
 
   my $t = Hello::Tester::tcp->new(
     loop     => $loop,
-    name     => "tco",
+    name     => "tcp",
     ip       => "127.0.0.1",
     port     => $port,
-    banner   => "^HELLO",
   );
 
   ok($t->test->else_done(1)->get, "connection failed when listener doesn't exist");
@@ -46,6 +45,24 @@ no_pending_futures {
   );
 
   ok($t->test->then_done(1)->else_done(0)->get, 'connection succeeded when listener exists');
+
+  my $t2 = Hello::Tester::tcp->new(
+    loop     => $loop,
+    name     => "tcp banner",
+    ip       => "127.0.0.1",
+    port     => $port,
+    banner   => "^HELLO",
+  );
+  ok($t2->test->then_done(1)->else_done(0)->get, 'connection succeeded with matching banner');
+
+  my $t3 = Hello::Tester::tcp->new(
+    loop     => $loop,
+    name     => "tcp banner fail",
+    ip       => "127.0.0.1",
+    port     => $port,
+    banner   => "^HELLNO",
+  );
+  ok($t3->test->then_done(0)->else_done(1)->get, 'connection succeeded with mismatched banner');
 } 'no futures left behind';
 
 done_testing;
