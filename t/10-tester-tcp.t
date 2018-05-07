@@ -32,37 +32,11 @@ no_pending_futures {
       ip       => '127.0.0.1',
       port     => $port,
     },
-    on_stream => sub {
-      my ($stream) = @_;
-      $stream->configure(
-        on_read => sub {},
-      );
-      $loop->add($stream);
-      $stream->write("HELLO WORLD\r\n");
-      $stream->close;
-    },
+    on_stream => sub {},
     on_listen_error => sub {},
   );
 
   ok($t->test->then_done(1)->else_done(0)->get, 'connection succeeded when listener exists');
-
-  my $t2 = Hello::Tester::tcp->new(
-    loop     => $loop,
-    name     => "tcp banner",
-    ip       => "127.0.0.1",
-    port     => $port,
-    banner   => "^HELLO",
-  );
-  ok($t2->test->then_done(1)->else_done(0)->get, 'connection succeeded with matching banner');
-
-  my $t3 = Hello::Tester::tcp->new(
-    loop     => $loop,
-    name     => "tcp banner fail",
-    ip       => "127.0.0.1",
-    port     => $port,
-    banner   => "^HELLNO",
-  );
-  ok($t3->test->then_done(0)->else_done(1)->get, 'connection succeeded with mismatched banner');
 } 'no futures left behind';
 
 done_testing;
