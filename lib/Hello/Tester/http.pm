@@ -23,9 +23,6 @@ sub test {
     my ($res) = @_;
     $self->loop->remove($http);
     $res->is_success ? $self->loop->new_future->done_later : $self->loop->new_future->fail_later($res->status_line);
-  })->else(sub {
-    $self->loop->remove($http);
-    $self->loop->new_future->fail_later("HTTP request failed");
   });
 }
 
