@@ -63,3 +63,11 @@
 [[tester.socket]]
   name = "devnull is not a socket"
   path = "/dev/null"
+
+[[tester.ping]]
+  name = "ping local"
+  ip = "127.0.0.1"
+
+[[tester.ping]]
+  name = "ping bad"
+  ip = "126.0.0.1"
