@@ -51,4 +51,3 @@ my $t404 = Hello::Tester::http->new(
 ok($t404->test->else_done(1)->get, "request failed when endpoint not found");
 
 done_testing;
-

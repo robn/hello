@@ -4,7 +4,6 @@ use warnings;
 use strict;
 
 use Test::More;
-use Test::Future;
 
 use IO::Async::Loop;
 
@@ -12,7 +11,7 @@ use Hello::Tester::ping;
 
 my $loop = IO::Async::Loop->new;
 
-no_pending_futures {
+{
   my $t = Hello::Tester::ping->new(
     loop    => $loop,
     name    => "ping",
@@ -29,6 +28,6 @@ no_pending_futures {
   );
 
   ok($t2->test->then_done(0)->else_done(1)->get, "ping to nowhere times out");
-} 'no futures left behind';
+}
 
 done_testing;

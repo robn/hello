@@ -4,7 +4,6 @@ use warnings;
 use strict;
 
 use Test::More;
-use Test::Future;
 
 use IO::Async::Loop;
 use Net::EmptyPort qw(empty_port);
@@ -13,7 +12,7 @@ use Hello::Tester::tcp;
 
 my $loop = IO::Async::Loop->new;
 
-no_pending_futures {
+{
   my $port = empty_port;
 
   my $t = Hello::Tester::tcp->new(
@@ -37,6 +36,6 @@ no_pending_futures {
   );
 
   ok($t->test->then_done(1)->else_done(0)->get, 'connection succeeded when listener exists');
-} 'no futures left behind';
+}
 
 done_testing;

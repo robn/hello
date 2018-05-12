@@ -4,7 +4,6 @@ use warnings;
 use strict;
 
 use Test::More;
-use Test::Future;
 
 use IO::Async::Loop;
 use File::Temp qw(tempdir tempfile);
@@ -13,7 +12,7 @@ use Hello::Tester::socket_banner;
 
 my $loop = IO::Async::Loop->new;
 
-no_pending_futures {
+{
   my $tempdir = tempdir(UNLINK => 1);
   my (undef, $path) = tempfile(OPEN => 0);
 
@@ -50,6 +49,6 @@ no_pending_futures {
     banner => "^HELLNO",
   );
   ok($t3->test->then_done(0)->else_done(1)->get, 'connection succeeded with mismatched banner');
-} 'no futures left behind';
+}
 
 done_testing;
