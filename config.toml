@@ -71,3 +71,20 @@
 [[tester.ping]]
   name = "ping bad"
   ip = "126.0.0.1"
+
+[[tester.tcp_tls]]
+  name = "tls bad verify"
+  ip = "127.0.0.1"
+  port = 631
+
+[[tester.tcp_tls]]
+  name = "tls ok no verify"
+  ip = "127.0.0.1"
+  port = 631
+  verify = 0
+
+[[tester.tcp_tls]]
+  name = "tls ok fingerprint"
+  ip = "127.0.0.1"
+  port = 631
+  fingerprint = "sha256$c217a64e39887661e8fce082b39d475acee5fa096f106dd440b4bd72ff6ea28e"
