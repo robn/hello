@@ -30,7 +30,7 @@ sub test_result {
   my $tv_start = [gettimeofday];
 
   Future->wait_any(
-    $self->test
+    Future->call(sub { $self->test })
       ->then(sub {
         return Future->done(Hello::Result->new(
           state   => 'SUCCESS',
