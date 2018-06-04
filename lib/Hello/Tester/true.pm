@@ -8,9 +8,7 @@ use Moo;
 with 'Hello::Tester';
 
 sub test {
-  my ($self) = @_;
-
-  return $self->loop->new_future->done_later;
+  return Future->done;
 }
 
 1;

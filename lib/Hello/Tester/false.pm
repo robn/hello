@@ -8,9 +8,7 @@ use Moo;
 with 'Hello::Tester';
 
 sub test {
-  my ($self) = @_;
-
-  return $self->loop->new_future->fail_later("failures gotta fail");
+  return Future->fail("failures gotta fail");
 }
 
 1;
