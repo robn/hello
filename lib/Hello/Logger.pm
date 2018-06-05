@@ -1,6 +1,7 @@
+package Hello::Logger;
+
 use strict;
 use warnings;
-package Hello::Logger;
 use parent 'Log::Dispatchouli::Global';
 
 use Log::Dispatchouli 2.002;
@@ -22,7 +23,8 @@ sub default_logger_args {
 }
 
 {
-  package Hello::Logger::_Logger;
+  package
+    Hello::Logger::_Logger;
   use parent 'Log::Dispatchouli';
 
   sub env_prefix { 'HELLO_LOG' }
