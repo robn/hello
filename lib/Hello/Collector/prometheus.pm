@@ -13,58 +13,31 @@ use Type::Utils qw(class_type);
 use Net::Async::HTTP::Server::PSGI;
 use Plack::Middleware::AccessLog;
 use Hello::Logger '$Logger';
-use Net::Prometheus;
+use Prometheus::Tiny 0.002;
 
 has ip   => ( is => 'ro', isa => Str, required => 1 );
 has port => ( is => 'ro', isa => Int, required => 1 );
 
-has _prom_client => ( is => 'ro', isa => class_type('Net::Prometheus'),
-                      default => sub { Net::Prometheus->new(disable_process_collector => 1) } );
-
-has _prom_counters => ( is => 'ro', isa => HashRef[class_type('Net::Prometheus::Counter')],
-                        default => sub {
-                          my $group = shift->_prom_client->new_metricgroup(
-                            namespace => 'hello',
-                            subsystem => 'test',
+has _prom_client => ( is => 'ro', isa => class_type('Prometheus::Tiny'),
+                      default => sub {
+                        my $prom = Prometheus::Tiny->new;
+                        for my $metric (qw(total success_total fail_total timeout_total)) {
+                          $prom->declare(
+                            "hello_test_$metric",
+                            help => $metric, # XXX
+                            type => 'counter',
                           );
-                          +{
-                            map {
-                              ($_ => $group->new_counter(
-                                name   => $_,
-                                help   => $_, # XXX
-                                labels => [qw(type name)],
-                              ))
-                            } qw(
-                              total
-                              success_total
-                              fail_total
-                              timeout_total
-                            )
-                          }
-                        } );
-
-has _prom_gauges => ( is => 'ro', isa => HashRef[class_type('Net::Prometheus::Gauge')],
-                        default => sub {
-                          my $group = shift->_prom_client->new_metricgroup(
-                            namespace => 'hello',
-                            subsystem => 'test',
+                        }
+                        for my $metric (qw(run_time_seconds last_time last_success_time last_fail_time last_timeout_time)) {
+                          $prom->declare(
+                            "hello_test_$metric",
+                            help => $metric, # XXX
+                            type => 'gauge',
                           );
-                          +{
-                            map {
-                              ($_ => $group->new_gauge(
-                                name   => $_,
-                                help   => $_, # XXX
-                                labels => [qw(type name)],
-                              ))
-                            } qw(
-                              run_time_seconds
-                              last_time
-                              last_success_time
-                              last_fail_time
-                              last_timeout_time
-                            )
-                          }
-                        } );
+                        }
+                        $prom
+                      }
+                    );
 
 sub init {
   my ($self) = @_;
@@ -73,9 +46,9 @@ sub init {
 
   my $http = Net::Async::HTTP::Server::PSGI->new(
     app => Plack::Middleware::AccessLog->wrap(
-      $self->_prom_client->psgi_app,
+      $self->_prom_client->psgi,
       logger => $Logger,
-    )
+    ),
   );
   $self->loop->add($http);
 
@@ -99,33 +72,32 @@ sub init {
 sub collect {
   my ($self, $result) = @_;
 
-  my @labels = ($result->type, $result->name);
+  my $prom = $self->_prom_client;
 
-  my $counters = $self->_prom_counters;
-  my $gauges = $self->_prom_gauges;
+  my %labels = ( type => $result->type, name => $result->name );
 
   my $time = int($result->start + $result->elapsed);
 
-  $counters->{total}->inc(@labels);
-  $gauges->{last_time}->set(@labels, $time);
+  $prom->inc('hello_test_total', \%labels);
+  $prom->set('hello_test_last_time', $time, \%labels);
 
   if ($result->is_success) {
-    $counters->{success_total}->inc(@labels);
-    $gauges->{last_success_time}->set(@labels, $time);
+    $prom->inc('hello_test_success_total', \%labels);
+    $prom->set('hello_test_last_success_time', $time, \%labels);
   }
   elsif ($result->is_fail) {
-    $counters->{fail_total}->inc(@labels);
-    $gauges->{last_fail_time}->set(@labels, $time);
+    $prom->inc('hello_test_fail_total', \%labels);
+    $prom->set('hello_test_last_fail_time', $time, \%labels);
   }
   elsif ($result->is_timeout) {
-    $counters->{timeout_total}->inc(@labels);
-    $gauges->{last_timeout_time}->set(@labels, $time);
+    $prom->inc('hello_test_timeout_total', \%labels);
+    $prom->set('hello_test_last_timeout_time', $time, \%labels);
   }
   else {
     die "result in an impossible state?";
   }
 
-  $gauges->{run_time_seconds}->set(@labels, $result->elapsed);
+  $prom->set('hello_test_run_time_seconds', $result->elapsed, \%labels);
 }
 
 1;
