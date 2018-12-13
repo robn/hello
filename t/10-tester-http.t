@@ -25,7 +25,18 @@ ok($t->test->else_done(1)->get, "request failed when http server doesn't exist")
 
 my $http = Net::Async::HTTP::Server::PSGI->new(
   app => sub {
-    return [ shift->{PATH_INFO} =~ m{/ohno$} ? '404' : '200', [], [] ];
+    my ($env) = @_;
+    my $path = $env->{PATH_INFO};
+    if ($path =~ m{/ohno$}) {
+      return [ 404, [], [] ];
+    }
+    if ($path =~ m{/headers$}) {
+      if (($env->{HTTP_X_FOO} || '') eq 'bar') {
+        return [ 200, [], [] ];
+      }
+      return [ 400, [], [] ];
+    }
+    return [ 200, [], [] ];
   },
 );
 $loop->add($http);
@@ -49,5 +60,24 @@ my $t404 = Hello::Tester::http->new(
 );
 
 ok($t404->test->else_done(1)->get, "request failed when endpoint not found");
+
+my $th = Hello::Tester::http->new(
+  loop    => $loop,
+  name    => "http headers",
+  url     => "http://localhost:$port/headers",
+  headers => {
+    'X-Foo' => 'bar',
+  },
+);
+
+ok($th->test->then_done(1)->get, "request with headers was passed correctly");
+
+my $th400 = Hello::Tester::http->new(
+  loop => $loop,
+  name => "http no headers",
+  url  => "http://localhost:$port/headers",
+);
+
+ok($th400->test->else_done(1)->get, "request with headers was passed correctly");
 
 done_testing;
