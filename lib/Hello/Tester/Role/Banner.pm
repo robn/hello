@@ -6,11 +6,16 @@ use strict;
 
 use Moo::Role;
 
-use Types::Standard qw(Str);
+use Types::Standard qw(RegexpRef);
 
 use IO::Async::Stream;
 
-has banner => ( is => 'ro', isa => Str, required => 1 );
+has banner => (
+  is       => 'ro',
+  isa      => RegexpRef,
+  required => 1,
+  coerce   => sub { ref $_[0] ? $_[0] : qr/$_[0]/ },
+);
 
 requires qw(loop);
 
