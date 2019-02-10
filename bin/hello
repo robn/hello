@@ -6,7 +6,7 @@ use strict;
 
 use Getopt::Long::Descriptive;
 use IO::Async::Loop;
-use Hello::World;
+use Hello::Config;
 
 my ($opt, $usage) = describe_options(
   'hello -c config.toml',
@@ -18,4 +18,4 @@ print $usage->text and exit if $opt->help;
 
 my $loop = IO::Async::Loop->new;
 
-Hello::World->from_config(loop => $loop, filename => $opt->config)->go->get;
+Hello::Config->new(loop => $loop, filename => $opt->config)->world->go->get;

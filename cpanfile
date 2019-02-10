@@ -19,7 +19,6 @@ requires "Plack::Middleware::AccessLog" => "0";
 requires "Prometheus::Tiny" => "0.002";
 requires "TOML" => "0";
 requires "Time::HiRes" => "0";
-requires "Type::Params" => "0";
 requires "Type::Utils" => "0";
 requires "Types::Standard" => "0";
 requires "experimental" => "0";
