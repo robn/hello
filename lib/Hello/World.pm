@@ -9,6 +9,8 @@ use Moo;
 use Types::Standard qw(ArrayRef);
 use Type::Utils qw(class_type role_type);
 
+use Date::Format qw(time2str);
+
 use Future;
 use Future::Utils qw(try_repeat);
 
@@ -56,7 +58,7 @@ sub go {
               $Logger->log("WARNING: last run took longer than interval $interval; skipped $skipped tests");
             }
 
-            $Logger->log(["next run in %ds, at %s", $wait_time, scalar localtime(time() + $wait_time)]);
+            $Logger->log(["next run in %ds, at %s", $wait_time, time2str("%Y-%m-%dT%H:%M:%S", time() + $wait_time)]);
 
             $self->loop->delay_future(after => $wait_time);
           })
