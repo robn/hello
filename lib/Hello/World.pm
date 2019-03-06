@@ -22,20 +22,18 @@ has testers => ( is => 'ro', isa => ArrayRef[role_type('Hello::Tester')], defaul
 sub go {
   my ($self) = @_;
 
-  Future->wait_all(
-    map {
-      my $tester = $_;
-      try_repeat {
-        $tester->logger->log("starting");
-        $tester->test_result
-          ->then(sub {
-            my ($result) = @_;
-            $self->_handle_result($tester, $result);
-            $self->_schedule_next($tester, $result);
-          })
-      } while => sub { 1 };
-    } $self->testers->@*
-  );
+  map {
+    my $tester = $_;
+    try_repeat {
+      $tester->logger->log("starting");
+      $tester->test_result
+        ->then(sub {
+          my ($result) = @_;
+          $self->_handle_result($tester, $result);
+          $self->_schedule_next($tester, $result);
+        })
+    } while => sub { 1 };
+  } $self->testers->@*
 }
 
 sub _handle_result {

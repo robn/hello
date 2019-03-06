@@ -18,4 +18,6 @@ print $usage->text and exit if $opt->help;
 
 my $loop = IO::Async::Loop->new;
 
-Hello::Config->new(loop => $loop, filename => $opt->config)->world->go->get;
+Hello::Config->new(loop => $loop, filename => $opt->config)->world->go;
+
+$loop->run;
