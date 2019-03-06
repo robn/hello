@@ -22,4 +22,13 @@ has is_success => ( is => 'lazy', isa => Bool, default => sub { shift->state eq 
 has is_fail    => ( is => 'lazy', isa => Bool, default => sub { shift->state eq 'FAIL'    } );
 has is_timeout => ( is => 'lazy', isa => Bool, default => sub { shift->state eq 'TIMEOUT' } );
 
+has description => (
+  is => 'lazy',
+  isa => Str,
+  default => sub {
+    my ($self) = @_;
+    sprintf "result: %s (%s) [%.2fs]", $self->state, $self->reason, $self->elapsed;
+  },
+);
+
 1;

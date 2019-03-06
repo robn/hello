@@ -38,7 +38,7 @@ sub go {
 
 sub _handle_result {
   my ($self, $tester, $result) = @_;
-  $tester->logger->log(["result: %s (%s) [%.2fs]", $result->state, $result->reason, $result->elapsed]);
+  $tester->logger->log($result->description);
   $_->collect($result) for $self->collectors->@*;
 }
 
