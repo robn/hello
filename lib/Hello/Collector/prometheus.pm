@@ -21,6 +21,7 @@ has port => ( is => 'ro', isa => Int, required => 1 );
 has _prom_client => ( is => 'ro', isa => class_type('Prometheus::Tiny'),
                       default => sub {
                         my $prom = Prometheus::Tiny->new;
+
                         for my $metric (qw(total success_total fail_total timeout_total)) {
                           $prom->declare(
                             "hello_test_$metric",
@@ -28,6 +29,7 @@ has _prom_client => ( is => 'ro', isa => class_type('Prometheus::Tiny'),
                             type => 'counter',
                           );
                         }
+
                         for my $metric (qw(run_time_seconds last_time last_success_time last_fail_time last_timeout_time)) {
                           $prom->declare(
                             "hello_test_$metric",
@@ -35,12 +37,21 @@ has _prom_client => ( is => 'ro', isa => class_type('Prometheus::Tiny'),
                             type => 'gauge',
                           );
                         }
+
+                        $prom->declare(
+                          'hello_up',
+                          help => 'Set to 1 if hello is running',
+                          type => 'gauge',
+                        );
+
                         $prom
-                      }
+                      },
                     );
 
 sub init {
   my ($self) = @_;
+
+  $self->_prom_client->set(hello_up => 1);
 
   my $Logger = $Logger->proxy({ proxy_prefix => "prometheus collector: " });
 
