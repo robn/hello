@@ -11,6 +11,7 @@ use Type::Utils qw(class_type);
 use Future;
 use Time::HiRes qw(gettimeofday tv_interval);
 
+use Hello::Logger;
 use Hello::Result;
 
 has loop => ( is => 'ro', isa => class_type('IO::Async::Loop'), required => 1 );
@@ -21,6 +22,13 @@ has interval => ( is => 'ro', isa => Int, default => sub { 120 } );
 has timeout  => ( is => 'ro', isa => Int, default => sub { 30 } );
 
 has type => ( is => 'lazy', isa => Str, default => sub { [ref(shift) =~ m/::([^:]+$)/]->[0] } );
+
+has logger => (
+  is => 'lazy',
+  default => sub {
+    Hello::Logger->current_logger->proxy({ proxy_prefix => shift->name.': ' })
+  },
+);
 
 requires qw(test);
 
