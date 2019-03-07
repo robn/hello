@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 use Moo::Role;
-use Types::Standard qw(Int Str HashRef);
+use Types::Standard qw(Int Str Bool);
 use Type::Utils qw(class_type);
 
 use Future;
@@ -22,6 +22,8 @@ has interval => ( is => 'ro', isa => Int, default => sub { 120 } );
 has timeout  => ( is => 'ro', isa => Int, default => sub { 30 } );
 
 has type => ( is => 'lazy', isa => Str, default => sub { [ref(shift) =~ m/::([^:]+$)/]->[0] } );
+
+has alive => ( is => 'rw', isa => Bool, default => sub { 0 } );
 
 has logger => (
   is => 'lazy',

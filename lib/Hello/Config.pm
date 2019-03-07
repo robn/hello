@@ -17,8 +17,8 @@ use Defined::KV;
 use Hello::World;
 use Hello::Logger '$Logger';
 
-has loop     => ( is => 'ro', isa => class_type('IO::Async::Loop'), required => 1 );
-has filename => ( is => 'ro', isa => Str,                           required => 1 );
+has world    => ( is => 'ro', isa => class_type('Hello::World'), required => 1 );
+has filename => ( is => 'ro', isa => Str,                        required => 1 );
 
 has _config_raw => (
   is  => 'lazy',
@@ -30,8 +30,8 @@ has _config_raw => (
     return $config;
   },
 );
-  
-sub world {
+
+sub apply {
   my ($self) = @_;
 
   my $config = $self->_config_raw;
@@ -40,8 +40,6 @@ sub world {
   my $default_interval = delete $default_config->{interval};
   my $default_timeout  = delete $default_config->{timeout};
 
-  my @collectors;
-
   for my $collector_type (keys $config->{collector}->%*) {
     my $collector_config = delete $config->{collector}->{$collector_type} // {};
 
@@ -49,18 +47,14 @@ sub world {
     require_module($collector_package); # XXX fail
 
     my $collector = $collector_package->new(
-      loop => $self->loop,
+      loop => $self->world->loop,
       %$collector_config,
     );
 
     $Logger->log("created '$collector_type' collector");
 
-    $collector->init;
-
-    push @collectors, $collector;
+    $self->world->add_collector($collector);
   }
-
-  my @testers;
 
   for my $tester_type (keys $config->{tester}->%*) {
     my $tester_list = delete $config->{tester}->{$tester_type} // [];
@@ -73,7 +67,7 @@ sub world {
       my $tester_timeout  = delete $tester_config->{timeout}  // $default_timeout;
 
       my $tester = $tester_package->new(
-        loop     => $self->loop,
+        loop     => $self->world->loop,
         defined_kv(interval => $tester_interval),
         defined_kv(timeout  => $tester_timeout),
         %$tester_config,
@@ -86,15 +80,9 @@ sub world {
         "timeout: ".$tester->timeout,
       ));
 
-      push @testers, $tester;
+      $self->world->add_tester($tester);
     }
   }
-
-  Hello::World->new(
-    loop => $self->loop,
-    collectors => \@collectors,
-    testers => \@testers,
-  );
 }
 
 1;

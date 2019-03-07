@@ -6,8 +6,9 @@ use strict;
 use experimental qw(postderef);
 
 use Moo;
-use Types::Standard qw(ArrayRef);
+use Types::Standard qw(Object Str);
 use Type::Utils qw(class_type role_type);
+use Type::Params qw(compile);
 
 use Date::Format qw(time2str);
 
@@ -16,30 +17,54 @@ use Future::Utils qw(try_repeat);
 
 has loop => ( is => 'ro', isa => class_type('IO::Async::Loop'), required => 1 );
 
-has collectors => ( is => 'ro', isa => ArrayRef[role_type('Hello::Collector')], default => sub { [] } );
-has testers => ( is => 'ro', isa => ArrayRef[role_type('Hello::Tester')], default => sub { [] } );
+has _collectors => ( is => 'rw', default => sub { [] } );
 
-sub go {
-  my ($self) = @_;
+sub add_collector {
+  state $check = compile(Object, role_type('Hello::Collector'));
+  my ($self, $collector) = $check->(@_);
+  push $self->_collectors->@*, $collector;
 
-  map {
-    my $tester = $_;
-    try_repeat {
-      $tester->logger->log("starting");
-      $tester->test_result
-        ->then(sub {
-          my ($result) = @_;
-          $self->_handle_result($tester, $result);
-          $self->_schedule_next($tester, $result);
-        })
-    } while => sub { 1 };
-  } $self->testers->@*
+  $collector->init;
+}
+
+has _testers => ( is => 'rw', default => sub { {} } );
+
+sub add_tester {
+  state $check = compile(Object, role_type('Hello::Tester'));
+  my ($self, $tester) = $check->(@_);
+
+  my $testers = $self->_testers;
+
+  if ($testers->{$tester->name}) {
+    $self->remove_tester($tester->name);
+  }
+
+  $testers->{$tester->name} = $tester;
+
+  $tester->alive(1);
+
+  try_repeat {
+    $tester->logger->log("starting");
+    $tester->test_result
+      ->then(sub {
+        my ($result) = @_;
+        $self->_handle_result($tester, $result);
+        $self->_schedule_next($tester, $result);
+      })
+  } while => sub { $tester->alive };
+}
+
+sub remove_tester {
+  state $check = compile(Object, Str);
+  my ($self, $name) = $check->(@_);
+  my $tester = delete $self->_testers->{$name};
+  $tester->alive(0) if $tester;
 }
 
 sub _handle_result {
   my ($self, $tester, $result) = @_;
   $tester->logger->log($result->description);
-  $_->collect($result) for $self->collectors->@*;
+  $_->collect($result) for $self->_collectors->@*;
 }
 
 sub _schedule_next {
