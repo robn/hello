@@ -1,0 +1,16 @@
+[collector.prometheus]
+  ip = "127.0.0.1"
+  port = 9200
+
+[group.servers]
+  name = "servers"
+  [[group.servers.members]]
+    name = "local"
+    ip = "127.0.0.1"
+  [[group.servers.members]]
+    name = "idk weird"
+    ip = "127.0.0.2"
+
+[[tester.ping]]
+  name = "ping"
+  group = "servers"

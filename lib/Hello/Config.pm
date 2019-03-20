@@ -66,21 +66,57 @@ sub apply {
       my $tester_interval = delete $tester_config->{interval} // $default_interval;
       my $tester_timeout  = delete $tester_config->{timeout}  // $default_timeout;
 
-      my $tester = $tester_package->new(
-        loop     => $self->world->loop,
-        defined_kv(interval => $tester_interval),
-        defined_kv(timeout  => $tester_timeout),
-        %$tester_config,
-      );
+      if (my $group_name = $tester_config->{group}) {
+        my $group = $config->{group}->{$group_name};
+        unless ($group) {
+          croak "E: $tester_config->{name} references group '$group_name', but it doesn't exist";
+        }
+        for my $member_config ($group->{members}->@*) {
+          my %member_tester_config = %$tester_config;
+          delete $member_tester_config{group};
 
-      $Logger->log(join('; ',
-        "created '$tester_type' tester",
-        "name: ".$tester->name,
-        "interval: ".$tester->interval,
-        "timeout: ".$tester->timeout,
-      ));
+          $member_tester_config{name} .= ":$member_config->{name}";
 
-      $self->world->add_tester($tester);
+          for my $k (keys %$member_config) {
+            next if grep { $_ eq $k } qw(interval timeout name);
+            $member_tester_config{$k} = $member_config->{$k} if exists $member_config->{$k};
+          }
+
+          my $tester = $tester_package->new(
+            loop     => $self->world->loop,
+            defined_kv(interval => $tester_interval),
+            defined_kv(timeout  => $tester_timeout),
+            %member_tester_config,
+          );
+
+          $Logger->log(join('; ',
+            "created '$tester_type' tester",
+            "name: ".$tester->name,
+            "interval: ".$tester->interval,
+            "timeout: ".$tester->timeout,
+          ));
+
+          $self->world->add_tester($tester);
+        }
+      }
+
+      else {
+        my $tester = $tester_package->new(
+          loop     => $self->world->loop,
+          defined_kv(interval => $tester_interval),
+          defined_kv(timeout  => $tester_timeout),
+          %$tester_config,
+        );
+
+        $Logger->log(join('; ',
+          "created '$tester_type' tester",
+          "name: ".$tester->name,
+          "interval: ".$tester->interval,
+          "timeout: ".$tester->timeout,
+        ));
+
+        $self->world->add_tester($tester);
+      }
     }
   }
 }
