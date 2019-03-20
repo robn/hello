@@ -8,14 +8,14 @@ use Test::More;
 use IO::Async::Loop;
 use Net::EmptyPort qw(empty_port);
 
-use Hello::Tester::tcp;
+use Hello::Tester::TCP;
 
 my $loop = IO::Async::Loop->new;
 
 {
   my $port = empty_port;
 
-  my $t = Hello::Tester::tcp->new(
+  my $t = Hello::Tester::TCP->new(
     loop     => $loop,
     name     => "tcp",
     ip       => "127.0.0.1",

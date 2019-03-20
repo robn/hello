@@ -1,4 +1,4 @@
-package Hello::Tester::true;
+package Hello::Tester::False;
 
 use 5.020;
 use warnings;
@@ -8,7 +8,7 @@ use Moo;
 with 'Hello::Tester';
 
 sub test {
-  return Future->done;
+  return Future->fail("failures gotta fail");
 }
 
 1;

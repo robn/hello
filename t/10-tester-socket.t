@@ -8,7 +8,7 @@ use Test::More;
 use IO::Async::Loop;
 use File::Temp qw(tempdir tempfile);
 
-use Hello::Tester::socket;
+use Hello::Tester::Socket;
 
 my $loop = IO::Async::Loop->new;
 
@@ -16,7 +16,7 @@ my $loop = IO::Async::Loop->new;
   my $tempdir = tempdir(UNLINK => 1);
   my (undef, $path) = tempfile(OPEN => 0);
 
-  my $t = Hello::Tester::socket->new(
+  my $t = Hello::Tester::Socket->new(
     loop => $loop,
     name => "socket",
     path => $path,

@@ -1,11 +1,11 @@
-package Hello::Tester::smtp;
+package Hello::Tester::SMTP;
 
 use 5.020;
 use warnings;
 use strict;
 
 use Moo;
-extends 'Hello::Tester::tcp';
+extends 'Hello::Tester::TCP';
 with 'Hello::Tester::Role::SMTP';
 
 around test => sub {

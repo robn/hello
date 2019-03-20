@@ -1,4 +1,4 @@
-package Hello::Tester::sleep;
+package Hello::Tester::Sleep;
 
 use 5.020;
 use warnings;

@@ -10,7 +10,7 @@ use IO::Async::SSL;
 use IO::Socket::SSL::Utils;
 use Net::EmptyPort qw(empty_port);
 
-use Hello::Tester::tcp_tls;
+use Hello::Tester::TCPTLS;
 
 my $SSL_CERT = IO::Socket::SSL::Utils::PEM_string2cert(<<EOF);
 -----BEGIN CERTIFICATE-----
@@ -65,7 +65,7 @@ my $loop = IO::Async::Loop->new;
 
 my $port = empty_port;
 
-my $t = Hello::Tester::tcp_tls->new(
+my $t = Hello::Tester::TCPTLS->new(
   loop   => $loop,
   name   => "tcp_tls",
   ip     => "127.0.0.1",
@@ -91,7 +91,7 @@ $loop->SSL_listen(
 
 ok($t->test->then_done(1)->else_done(0)->get, 'connection succeeded when listener exists');
 
-my $t2 = Hello::Tester::tcp_tls->new(
+my $t2 = Hello::Tester::TCPTLS->new(
   loop   => $loop,
   name   => "tcp_tls verify",
   ip     => "127.0.0.1",

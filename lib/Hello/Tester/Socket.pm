@@ -1,4 +1,4 @@
-package Hello::Tester::socket;
+package Hello::Tester::Socket;
 
 use 5.020;
 use warnings;

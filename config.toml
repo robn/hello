@@ -1,4 +1,4 @@
-[collector.prometheus]
+[collector.Prometheus]
   ip = "127.0.0.1"
   port = 9200
 
@@ -6,19 +6,19 @@
 #  interval = 120
 #  timeout = 5
 
-[[tester.true]]
+[[tester.True]]
   name = "always succeeds"
 
-[[tester.false]]
+[[tester.False]]
   name = "always fails"
 
-[[tester.sleep]]
+[[tester.Sleep]]
   name = "nap time"
   sleep = 60
   timeout = 10
   interval = 2
 
-[[tester.tcp]]
+[[tester.TCP]]
   # interval =
   # timeout =
   name = "printer"
@@ -26,7 +26,7 @@
   port = 631
   # banner =
 
-[[tester.tcp]]
+[[tester.TCP]]
   # interval =
   # timeout =
   name = "no printer"
@@ -34,7 +34,7 @@
   port = 632
   # banner =
 
-[[tester.tcp]]
+[[tester.TCP]]
   # interval =
   # timeout =
   name = "far away"
@@ -42,48 +42,48 @@
   port = 123
   # banner =
 
-[[tester.tcp]]
+[[tester.TCP]]
   name = "vm ssh"
   ip = "10.211.55.49"
   port = 22
   banner = "^SSH-"
 
-[[tester.http]]
+[[tester.HTTP]]
   name = "printer web"
   url = "http://localhost:631"
 
-[[tester.http]]
+[[tester.HTTP]]
   name = "printer web 404"
   url = "http://localhost:631/zub"
 
-[[tester.socket]]
+[[tester.Socket]]
   name = "mdns responder"
   path = "/var/run/mDNSResponder"
 
-[[tester.socket]]
+[[tester.Socket]]
   name = "devnull is not a socket"
   path = "/dev/null"
 
-[[tester.ping]]
+[[tester.Ping]]
   name = "ping local"
   ip = "127.0.0.1"
 
-[[tester.ping]]
+[[tester.Ping]]
   name = "ping bad"
   ip = "126.0.0.1"
 
-[[tester.tcp_tls]]
+[[tester.TCPTLS]]
   name = "tls bad verify"
   ip = "127.0.0.1"
   port = 631
 
-[[tester.tcp_tls]]
+[[tester.TCPTLS]]
   name = "tls ok no verify"
   ip = "127.0.0.1"
   port = 631
   verify = 0
 
-[[tester.tcp_tls]]
+[[tester.TCPTLS]]
   name = "tls ok fingerprint"
   ip = "127.0.0.1"
   port = 631

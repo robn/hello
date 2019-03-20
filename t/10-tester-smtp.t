@@ -10,7 +10,7 @@ use IO::Async::Stream;
 use Net::EmptyPort qw(empty_port);
 use MIME::Base64 qw(decode_base64);
 
-use Hello::Tester::smtp;
+use Hello::Tester::SMTP;
 
 my $loop = IO::Async::Loop->new;
 
@@ -19,7 +19,7 @@ my $loop = IO::Async::Loop->new;
   my $username = "username";
   my $password = "password";
 
-  my $t = Hello::Tester::smtp->new(
+  my $t = Hello::Tester::SMTP->new(
     loop     => $loop,
     name     => "smtp",
     ip       => "127.0.0.1",
@@ -67,7 +67,7 @@ my $loop = IO::Async::Loop->new;
 
   ok($t->test->then_done(1)->else_done(0)->get, 'smtp connection succeeded when listener exists');
 
-  my $t2 = Hello::Tester::smtp->new(
+  my $t2 = Hello::Tester::SMTP->new(
     loop     => $loop,
     name     => "smtp auth",
     ip       => "127.0.0.1",
@@ -78,7 +78,7 @@ my $loop = IO::Async::Loop->new;
 
   ok($t->test->then_done(1)->else_done(0)->get, 'smtp connection and authentication succeeded');
 
-  my $t3 = Hello::Tester::smtp->new(
+  my $t3 = Hello::Tester::SMTP->new(
     loop     => $loop,
     name     => "smtp auth fail",
     ip       => "127.0.0.1",

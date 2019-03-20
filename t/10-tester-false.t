@@ -7,12 +7,12 @@ use Test::More;
 
 use IO::Async::Loop;
 
-use Hello::Tester::false;
+use Hello::Tester::False;
 
 my $loop = IO::Async::Loop->new;
 
 {
-  my $t = Hello::Tester::false->new(
+  my $t = Hello::Tester::False->new(
     loop     => $loop,
     name     => "false",
   );

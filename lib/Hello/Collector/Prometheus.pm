@@ -1,4 +1,4 @@
-package Hello::Collector::prometheus;
+package Hello::Collector::Prometheus;
 
 use 5.020;
 use warnings;

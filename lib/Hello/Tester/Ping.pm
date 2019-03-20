@@ -1,4 +1,4 @@
-package Hello::Tester::ping;
+package Hello::Tester::Ping;
 
 use 5.020;
 use warnings;

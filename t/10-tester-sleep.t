@@ -7,12 +7,12 @@ use Test::More;
 
 use IO::Async::Loop;
 
-use Hello::Tester::sleep;
+use Hello::Tester::Sleep;
 
 my $loop = IO::Async::Loop->new;
 
 {
-  my $t = Hello::Tester::sleep->new(
+  my $t = Hello::Tester::Sleep->new(
     loop     => $loop,
     name     => "sleep 5",
     sleep    => 5,

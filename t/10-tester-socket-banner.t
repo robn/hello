@@ -8,7 +8,7 @@ use Test::More;
 use IO::Async::Loop;
 use File::Temp qw(tempdir tempfile);
 
-use Hello::Tester::socket_banner;
+use Hello::Tester::SocketBanner;
 
 my $loop = IO::Async::Loop->new;
 
@@ -34,7 +34,7 @@ my $loop = IO::Async::Loop->new;
     on_listen_error => sub {},
   );
 
-  my $t2 = Hello::Tester::socket_banner->new(
+  my $t2 = Hello::Tester::SocketBanner->new(
     loop   => $loop,
     name   => "socket_banner",
     path   => $path,
@@ -42,7 +42,7 @@ my $loop = IO::Async::Loop->new;
   );
   ok($t2->test->then_done(1)->else_done(0)->get, 'connection succeeded with matching banner');
 
-  my $t3 = Hello::Tester::socket_banner->new(
+  my $t3 = Hello::Tester::SocketBanner->new(
     loop   => $loop,
     name   => "socket_banner fail",
     path   => $path,

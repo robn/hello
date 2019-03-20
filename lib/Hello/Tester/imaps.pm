@@ -1,11 +1,11 @@
-package Hello::Tester::imaps;
+package Hello::Tester::IMAPS;
 
 use 5.020;
 use warnings;
 use strict;
 
 use Moo;
-extends 'Hello::Tester::tcp_tls';
+extends 'Hello::Tester::TCPTLS';
 with 'Hello::Tester::Role::IMAP';
 
 around test => sub {

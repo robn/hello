@@ -9,7 +9,7 @@ use IO::Async::Loop;
 use IO::Async::Stream;
 use Net::EmptyPort qw(empty_port);
 
-use Hello::Tester::imap;
+use Hello::Tester::IMAP;
 
 my $loop = IO::Async::Loop->new;
 
@@ -18,7 +18,7 @@ my $loop = IO::Async::Loop->new;
   my $username = "username";
   my $password = "password";
 
-  my $t = Hello::Tester::imap->new(
+  my $t = Hello::Tester::IMAP->new(
     loop     => $loop,
     name     => "imap",
     ip       => "127.0.0.1",
@@ -60,7 +60,7 @@ my $loop = IO::Async::Loop->new;
 
   ok($t->test->then_done(1)->else_done(0)->get, 'imap connection succeeded when listener exists');
 
-  my $t2 = Hello::Tester::imap->new(
+  my $t2 = Hello::Tester::IMAP->new(
     loop     => $loop,
     name     => "imap auth",
     ip       => "127.0.0.1",
@@ -71,7 +71,7 @@ my $loop = IO::Async::Loop->new;
 
   ok($t->test->then_done(1)->else_done(0)->get, 'imap connection and authentication succeeded');
 
-  my $t3 = Hello::Tester::imap->new(
+  my $t3 = Hello::Tester::IMAP->new(
     loop     => $loop,
     name     => "imap auth fail",
     ip       => "127.0.0.1",

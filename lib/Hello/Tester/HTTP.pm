@@ -1,4 +1,4 @@
-package Hello::Tester::http;
+package Hello::Tester::HTTP;
 
 use 5.020;
 use warnings;

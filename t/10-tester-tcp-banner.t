@@ -8,7 +8,7 @@ use Test::More;
 use IO::Async::Loop;
 use Net::EmptyPort qw(empty_port);
 
-use Hello::Tester::tcp_banner;
+use Hello::Tester::TCPBanner;
 
 my $loop = IO::Async::Loop->new;
 
@@ -34,7 +34,7 @@ my $loop = IO::Async::Loop->new;
     on_listen_error => sub {},
   );
 
-  my $t2 = Hello::Tester::tcp_banner->new(
+  my $t2 = Hello::Tester::TCPBanner->new(
     loop   => $loop,
     name   => "tcp_banner",
     ip     => "127.0.0.1",
@@ -43,7 +43,7 @@ my $loop = IO::Async::Loop->new;
   );
   ok($t2->test->then_done(1)->else_done(0)->get, 'connection succeeded with matching banner');
 
-  my $t3 = Hello::Tester::tcp_banner->new(
+  my $t3 = Hello::Tester::TCPBanner->new(
     loop   => $loop,
     name   => "tcp_banner fail",
     ip     => "127.0.0.1",

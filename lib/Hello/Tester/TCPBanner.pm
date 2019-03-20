@@ -1,11 +1,11 @@
-package Hello::Tester::tcp_banner;
+package Hello::Tester::TCPBanner;
 
 use 5.020;
 use warnings;
 use strict;
 
 use Moo;
-extends 'Hello::Tester::tcp';
+extends 'Hello::Tester::TCP';
 with 'Hello::Tester::Role::Banner';
 
 around test => sub {

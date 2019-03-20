@@ -9,13 +9,13 @@ use IO::Async::Loop;
 use Net::EmptyPort qw(empty_port);
 use Net::Async::HTTP::Server::PSGI;
 
-use Hello::Tester::http;
+use Hello::Tester::HTTP;
 
 my $loop = IO::Async::Loop->new;
 
 my $port = empty_port;
 
-my $t = Hello::Tester::http->new(
+my $t = Hello::Tester::HTTP->new(
   loop => $loop,
   name => "http",
   url  => "http://localhost:$port",
@@ -53,7 +53,7 @@ $http->listen(
 
 ok($t->test->then_done(1)->get, "request succeeded when http server exists");
 
-my $t404 = Hello::Tester::http->new(
+my $t404 = Hello::Tester::HTTP->new(
   loop => $loop,
   name => "http 404",
   url  => "http://localhost:$port/ohno",
@@ -61,7 +61,7 @@ my $t404 = Hello::Tester::http->new(
 
 ok($t404->test->else_done(1)->get, "request failed when endpoint not found");
 
-my $th = Hello::Tester::http->new(
+my $th = Hello::Tester::HTTP->new(
   loop    => $loop,
   name    => "http headers",
   url     => "http://localhost:$port/headers",
@@ -72,7 +72,7 @@ my $th = Hello::Tester::http->new(
 
 ok($th->test->then_done(1)->get, "request with headers was passed correctly");
 
-my $th400 = Hello::Tester::http->new(
+my $th400 = Hello::Tester::HTTP->new(
   loop => $loop,
   name => "http no headers",
   url  => "http://localhost:$port/headers",

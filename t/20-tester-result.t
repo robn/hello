@@ -7,14 +7,14 @@ use Test::More;
 
 use IO::Async::Loop;
 
-use Hello::Tester::true;
-use Hello::Tester::false;
-use Hello::Tester::sleep;
+use Hello::Tester::True;
+use Hello::Tester::False;
+use Hello::Tester::Sleep;
 
 my $loop = IO::Async::Loop->new;
 
 {
-  my $t = Hello::Tester::true->new(
+  my $t = Hello::Tester::True->new(
     loop     => $loop,
     name     => "true",
   );
@@ -25,7 +25,7 @@ my $loop = IO::Async::Loop->new;
 }
 
 {
-  my $t = Hello::Tester::false->new(
+  my $t = Hello::Tester::False->new(
     loop     => $loop,
     name     => "false",
   );
@@ -36,7 +36,7 @@ my $loop = IO::Async::Loop->new;
 }
 
 {
-  my $t = Hello::Tester::sleep->new(
+  my $t = Hello::Tester::Sleep->new(
     loop     => $loop,
     name     => "sleep 10",
     sleep    => 10,
