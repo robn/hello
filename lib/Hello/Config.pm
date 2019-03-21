@@ -14,6 +14,10 @@ use TOML qw(from_toml);
 use Module::Runtime qw(require_module);
 use Defined::KV;
 
+use Hello::Config::Collector;
+use Hello::Config::Group;
+use Hello::Config::Tester;
+
 use Hello::World;
 use Hello::Logger '$Logger';
 
@@ -31,7 +35,7 @@ has _config_raw => (
   },
 );
 
-sub apply {
+sub inflate {
   my ($self) = @_;
 
   my $config = $self->_config_raw;
@@ -40,36 +44,67 @@ sub apply {
   my $default_interval = delete $default_config->{interval};
   my $default_timeout  = delete $default_config->{timeout};
 
-  for my $collector_type (keys $config->{collector}->%*) {
-    my $collector_config = delete $config->{collector}->{$collector_type} // {};
+  for my $id (keys $config->{collector}->%*) {
+    my $config = $config->{collector}->{$id} // {};
 
-    my $collector_package = "Hello::Collector::$collector_type";
-    require_module($collector_package); # XXX fail
-
-    my $collector = $collector_package->new(
-      loop => $self->world->loop,
-      %$collector_config,
+    my $collector = Hello::Config::Collector->new(
+      world => $self->world,
+      class => $config->{class},
+      id    => $id,
+      args  => {
+        map { $_ => $config->{$_} }
+          grep { ! m/^(?:world|class|args)$/ }
+            keys %$config,
+      },
     );
-
-    $Logger->log("created '$collector_type' collector");
-
-    $self->world->add_collector($collector);
+    $collector->inflate;
   }
 
-  for my $tester_type (keys $config->{tester}->%*) {
-    my $tester_list = delete $config->{tester}->{$tester_type} // [];
+  for my $id (keys $config->{group}->%*) {
+    my $config = $config->{group}->{$id} // {};
 
-    my $tester_package = "Hello::Tester::$tester_type";
-    require_module($tester_package); # XXX fail
+    my $group = Hello::Config::Group->new(
+      world => $self->world,
+      class => $config->{class},
+      id    => $id,
+      defined_kv(default_interval => $default_interval),
+      defined_kv(default_timeout  => $default_timeout),
+      args  => {
+        map { $_ => $config->{$_} }
+          grep { ! m/^(?:world|class|args)$/ }
+            keys %$config,
+      },
+    );
+    $group->inflate;
+  }
 
-    for my $tester_config ($tester_list->@*) {
-      my $tester_interval = delete $tester_config->{interval} // $default_interval;
-      my $tester_timeout  = delete $tester_config->{timeout}  // $default_timeout;
+  for my $id (keys $config->{tester}->%*) {
+    my $config = $config->{tester}->{$id} // {};
 
-      if (my $group_name = $tester_config->{group}) {
+    my $interval = $config->{interval} // $default_interval;
+    my $timeout  = $config->{timeout}  // $default_timeout;
+
+    my $tester = Hello::Config::Tester->new(
+      world => $self->world,
+      class => $config->{class},
+      id    => $id,
+      args  => {
+        defined_kv(interval => $interval),
+        defined_kv(timeout  => $timeout),
+        map { $_ => $config->{$_} }
+          grep { ! m/^(?:world|class|args)$/ }
+            keys %$config,
+      },
+    );
+    $tester->inflate;
+  }
+}
+
+=pod
+      if (my $group_name = $config->{group}) {
         my $group = $config->{group}->{$group_name};
         unless ($group) {
-          croak "E: $tester_config->{name} references group '$group_name', but it doesn't exist";
+          croak "E: $config->{name} references group '$group_name', but it doesn't exist";
         }
         for my $member_config ($group->{members}->@*) {
           my %member_tester_config = %$tester_config;
@@ -82,30 +117,33 @@ sub apply {
             $member_tester_config{$k} = $member_config->{$k} if exists $member_config->{$k};
           }
 
-          my $tester = $tester_package->new(
-            loop     => $self->world->loop,
-            defined_kv(interval => $tester_interval),
-            defined_kv(timeout  => $tester_timeout),
-            %member_tester_config,
+          my $tester = Hello::Config::Tester->new(
+            world => $self->world,
+            class => $tester_config->{class},
+            args  => {
+              defined_kv(interval => $tester_interval),
+              defined_kv(timeout  => $tester_timeout),
+              map { $_ => $tester_config->{$_} }
+                grep { !m/^(?:world|class|args)$/ }
+                  keys %member_tester_config,
+            },
           );
 
-          $Logger->log(join('; ',
-            "created '$tester_type' tester",
-            "name: ".$tester->name,
-            "interval: ".$tester->interval,
-            "timeout: ".$tester->timeout,
-          ));
-
-          $self->world->add_tester($tester);
+          $self->world->add_tester($tester->inflate);
         }
       }
 
       else {
-        my $tester = $tester_package->new(
-          loop     => $self->world->loop,
-          defined_kv(interval => $tester_interval),
-          defined_kv(timeout  => $tester_timeout),
-          %$tester_config,
+        my $tester = Hello::Config::Tester->new(
+          world => $self->world,
+          class => $tester_config->{class},
+          args  => {
+            defined_kv(interval => $tester_interval),
+            defined_kv(timeout  => $tester_timeout),
+            map { $_ => $tester_config->{$_} }
+              grep { !m/^(?:world|class|args)$/ }
+                keys %$tester_config,
+          },
         );
 
         $Logger->log(join('; ',
@@ -115,10 +153,11 @@ sub apply {
           "timeout: ".$tester->timeout,
         ));
 
-        $self->world->add_tester($tester);
+        $self->world->add_tester($tester->inflate);
       }
     }
   }
 }
+=cut
 
 1;

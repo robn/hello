@@ -20,7 +20,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t = Hello::Tester::IMAP->new(
     loop     => $loop,
-    name     => "imap",
+    id       => "imap",
     ip       => "127.0.0.1",
     port     => $port,
   );
@@ -62,7 +62,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t2 = Hello::Tester::IMAP->new(
     loop     => $loop,
-    name     => "imap auth",
+    id       => "imap auth",
     ip       => "127.0.0.1",
     port     => $port,
     username => $username,
@@ -73,7 +73,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t3 = Hello::Tester::IMAP->new(
     loop     => $loop,
-    name     => "imap auth fail",
+    id       => "imap auth fail",
     ip       => "127.0.0.1",
     port     => $port,
     username => $username,

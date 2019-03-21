@@ -1,32 +1,34 @@
-[collector.Prometheus]
+[collector.prometheus]
+  class = "Hello::Collector::Prometheus"
   ip = "127.0.0.1"
   port = 9200
 
-#[tester._defaults_]
+#[tester."_defaults_"]
 #  interval = 120
 #  timeout = 5
 
-[[tester.True]]
-  name = "always succeeds"
+[tester."always succeeds"]
+  class = "Hello::Tester::True"
 
-[[tester.False]]
-  name = "always fails"
+[tester."always fails"]
+  class = "Hello::Tester::False"
 
-[[tester.Sleep]]
-  name = "nap time"
+[tester."nap time"]
+  class = "Hello::Tester::Sleep"
   sleep = 60
   timeout = 10
   interval = 2
 
-[[tester.TCP]]
+[tester."printer"]
+  class = "Hello::Tester::TCP"
   # interval =
   # timeout =
-  name = "printer"
   ip = "127.0.0.1"
   port = 631
   # banner =
 
-[[tester.TCP]]
+[tester."no printer"]
+  class = "Hello::Tester::TCP"
   # interval =
   # timeout =
   name = "no printer"
@@ -34,57 +36,57 @@
   port = 632
   # banner =
 
-[[tester.TCP]]
+[tester."far away"]
+  class = "Hello::Tester::TCP"
   # interval =
   # timeout =
-  name = "far away"
   ip = "66.111.4.4"
   port = 123
   # banner =
 
-[[tester.TCP]]
-  name = "vm ssh"
+[tester."vm ssh"]
+  class = "Hello::Tester::TCP"
   ip = "10.211.55.49"
   port = 22
   banner = "^SSH-"
 
-[[tester.HTTP]]
-  name = "printer web"
+[tester."printer web"]
+  class = "Hello::Tester::HTTP"
   url = "http://localhost:631"
 
-[[tester.HTTP]]
-  name = "printer web 404"
+[tester."printer web 404"]
+  class = "Hello::Tester::HTTP"
   url = "http://localhost:631/zub"
 
-[[tester.Socket]]
-  name = "mdns responder"
+[tester."mdns responder"]
+  class = "Hello::Tester::Socket"
   path = "/var/run/mDNSResponder"
 
-[[tester.Socket]]
-  name = "devnull is not a socket"
+[tester."devnull is not a socket"]
+  class = "Hello::Tester::Socket"
   path = "/dev/null"
 
-[[tester.Ping]]
-  name = "ping local"
+[tester."ping local"]
+  class = "Hello::Tester::Ping"
   ip = "127.0.0.1"
 
-[[tester.Ping]]
-  name = "ping bad"
+[tester."ping bad"]
+  class = "Hello::Tester::Ping"
   ip = "126.0.0.1"
 
-[[tester.TCPTLS]]
-  name = "tls bad verify"
+[tester."tls bad verify"]
+  class = "Hello::Tester::TCPTLS"
   ip = "127.0.0.1"
   port = 631
 
-[[tester.TCPTLS]]
-  name = "tls ok no verify"
+[tester."tls ok no verify"]
+  class = "Hello::Tester::TCPTLS"
   ip = "127.0.0.1"
   port = 631
   verify = 0
 
-[[tester.TCPTLS]]
-  name = "tls ok fingerprint"
+[tester."tls ok fingerprint"]
+  class = "Hello::Tester::TCPTLS"
   ip = "127.0.0.1"
   port = 631
   fingerprint = "sha256$c217a64e39887661e8fce082b39d475acee5fa096f106dd440b4bd72ff6ea28e"

@@ -67,7 +67,7 @@ my $port = empty_port;
 
 my $t = Hello::Tester::TCPTLS->new(
   loop   => $loop,
-  name   => "tcp_tls",
+  id     => "tcp_tls",
   ip     => "127.0.0.1",
   port   => $port,
   verify => 0,
@@ -93,7 +93,7 @@ ok($t->test->then_done(1)->else_done(0)->get, 'connection succeeded when listene
 
 my $t2 = Hello::Tester::TCPTLS->new(
   loop   => $loop,
-  name   => "tcp_tls verify",
+  id     => "tcp_tls verify",
   ip     => "127.0.0.1",
   port   => $port,
   verify => 1,

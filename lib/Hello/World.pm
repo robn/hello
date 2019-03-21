@@ -15,6 +15,8 @@ use Date::Format qw(time2str);
 use Future;
 use Future::Utils qw(try_repeat);
 
+use Hello::Logger '$Logger';
+
 has loop => ( is => 'ro', isa => class_type('IO::Async::Loop'), required => 1 );
 
 has _collectors => ( is => 'rw', default => sub { [] } );
@@ -23,6 +25,10 @@ sub add_collector {
   state $check = compile(Object, role_type('Hello::Collector'));
   my ($self, $collector) = $check->(@_);
   push $self->_collectors->@*, $collector;
+
+  # XXX replaceable?
+
+  $Logger->log(["added collector: %s", $collector->id]);
 
   $collector->init;
 }
@@ -35,11 +41,14 @@ sub add_tester {
 
   my $testers = $self->_testers;
 
-  if ($testers->{$tester->name}) {
-    $self->remove_tester($tester->name);
+  if ($testers->{$tester->id}) {
+    $Logger->log(["replacing existing tester: %s", $tester->id]);
+    $self->remove_tester($tester->id);
   }
 
-  $testers->{$tester->name} = $tester;
+  $Logger->log(["added tester: %s; interval %d; timeout %d", $tester->id, $tester->interval, $tester->timeout]);
+
+  $testers->{$tester->id} = $tester;
 
   $tester->alive(1);
 

@@ -14,7 +14,7 @@ my $loop = IO::Async::Loop->new;
 {
   my $t = Hello::Tester::True->new(
     loop     => $loop,
-    name     => "true",
+    id       => "true",
   );
 
   ok($t->test->then_done(1)->get, 'always completes');

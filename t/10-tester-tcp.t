@@ -17,7 +17,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t = Hello::Tester::TCP->new(
     loop     => $loop,
-    name     => "tcp",
+    id       => "tcp",
     ip       => "127.0.0.1",
     port     => $port,
   );

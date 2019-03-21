@@ -1,16 +1,24 @@
 [collector.prometheus]
+  class = "Hello::Collector::Prometheus"
   ip = "127.0.0.1"
   port = 9200
 
 [group.servers]
-  name = "servers"
+  class = "Hello::Group::Static"
+
   [[group.servers.members]]
-    name = "local"
+    id = "local"
     ip = "127.0.0.1"
   [[group.servers.members]]
-    name = "idk weird"
+    id = "local2"
     ip = "127.0.0.2"
 
-[[tester.ping]]
-  name = "ping"
-  group = "servers"
+  [group.servers.tester]
+    ping = {
+      class = "Hello::Tester::Ping"
+    }
+
+[tester."static ping"]
+  class = "Hello::Tester::Ping"
+  ip = "127.0.0.1"
+  interval = 5

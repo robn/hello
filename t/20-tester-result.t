@@ -16,7 +16,7 @@ my $loop = IO::Async::Loop->new;
 {
   my $t = Hello::Tester::True->new(
     loop     => $loop,
-    name     => "true",
+    id       => "true",
   );
 
   my $r = $t->test_result->get;
@@ -27,7 +27,7 @@ my $loop = IO::Async::Loop->new;
 {
   my $t = Hello::Tester::False->new(
     loop     => $loop,
-    name     => "false",
+    id       => "false",
   );
 
   my $r = $t->test_result->get;
@@ -38,7 +38,7 @@ my $loop = IO::Async::Loop->new;
 {
   my $t = Hello::Tester::Sleep->new(
     loop     => $loop,
-    name     => "sleep 10",
+    id       => "sleep 10",
     sleep    => 10,
     timeout  => 2,
   );

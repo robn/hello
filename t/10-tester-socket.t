@@ -18,7 +18,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t = Hello::Tester::Socket->new(
     loop => $loop,
-    name => "socket",
+    id   => "socket",
     path => $path,
   );
 

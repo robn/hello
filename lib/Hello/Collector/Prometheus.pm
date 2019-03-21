@@ -85,7 +85,7 @@ sub collect {
 
   my $prom = $self->_prom_client;
 
-  my %labels = ( type => $result->type, name => $result->name );
+  my %labels = ( id => $result->id );
 
   my $time = int($result->start + $result->elapsed);
 

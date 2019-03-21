@@ -21,7 +21,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t = Hello::Tester::SMTP->new(
     loop     => $loop,
-    name     => "smtp",
+    id       => "smtp",
     ip       => "127.0.0.1",
     port     => $port,
   );
@@ -69,7 +69,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t2 = Hello::Tester::SMTP->new(
     loop     => $loop,
-    name     => "smtp auth",
+    id       => "smtp auth",
     ip       => "127.0.0.1",
     port     => $port,
     username => $username,
@@ -80,7 +80,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t3 = Hello::Tester::SMTP->new(
     loop     => $loop,
-    name     => "smtp auth fail",
+    id       => "smtp auth fail",
     ip       => "127.0.0.1",
     port     => $port,
     username => $username,

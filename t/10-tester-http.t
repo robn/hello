@@ -17,7 +17,7 @@ my $port = empty_port;
 
 my $t = Hello::Tester::HTTP->new(
   loop => $loop,
-  name => "http",
+  id   => "http",
   url  => "http://localhost:$port",
 );
 
@@ -55,7 +55,7 @@ ok($t->test->then_done(1)->get, "request succeeded when http server exists");
 
 my $t404 = Hello::Tester::HTTP->new(
   loop => $loop,
-  name => "http 404",
+  id   => "http 404",
   url  => "http://localhost:$port/ohno",
 );
 
@@ -63,7 +63,7 @@ ok($t404->test->else_done(1)->get, "request failed when endpoint not found");
 
 my $th = Hello::Tester::HTTP->new(
   loop    => $loop,
-  name    => "http headers",
+  id      => "http headers",
   url     => "http://localhost:$port/headers",
   headers => {
     'X-Foo' => 'bar',
@@ -74,7 +74,7 @@ ok($th->test->then_done(1)->get, "request with headers was passed correctly");
 
 my $th400 = Hello::Tester::HTTP->new(
   loop => $loop,
-  name => "http no headers",
+  id   => "http no headers",
   url  => "http://localhost:$port/headers",
 );
 

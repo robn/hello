@@ -14,7 +14,7 @@ my $loop = IO::Async::Loop->new;
 {
   my $t = Hello::Tester::Ping->new(
     loop    => $loop,
-    name    => "ping",
+    id      => "ping",
     ip      => "127.0.0.1",
   );
 
@@ -22,7 +22,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t2 = Hello::Tester::Ping->new(
     loop    => $loop,
-    name    => "ping fail",
+    id      => "ping fail",
     ip      => "126.0.0.1",
     timeout => 5,
   );

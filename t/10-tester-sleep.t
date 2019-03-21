@@ -14,7 +14,7 @@ my $loop = IO::Async::Loop->new;
 {
   my $t = Hello::Tester::Sleep->new(
     loop     => $loop,
-    name     => "sleep 5",
+    id       => "sleep 5",
     sleep    => 5,
   );
 

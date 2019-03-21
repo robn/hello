@@ -36,7 +36,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t2 = Hello::Tester::SocketBanner->new(
     loop   => $loop,
-    name   => "socket_banner",
+    id     => "socket_banner",
     path   => $path,
     banner => "^HELLO",
   );
@@ -44,7 +44,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t3 = Hello::Tester::SocketBanner->new(
     loop   => $loop,
-    name   => "socket_banner fail",
+    id     => "socket_banner fail",
     path   => $path,
     banner => "^HELLNO",
   );

@@ -36,7 +36,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t2 = Hello::Tester::TCPBanner->new(
     loop   => $loop,
-    name   => "tcp_banner",
+    id     => "tcp_banner",
     ip     => "127.0.0.1",
     port   => $port,
     banner => "^HELLO",
@@ -45,7 +45,7 @@ my $loop = IO::Async::Loop->new;
 
   my $t3 = Hello::Tester::TCPBanner->new(
     loop   => $loop,
-    name   => "tcp_banner fail",
+    id     => "tcp_banner fail",
     ip     => "127.0.0.1",
     port   => $port,
     banner => "^HELLNO",
