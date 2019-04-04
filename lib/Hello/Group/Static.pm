@@ -49,10 +49,12 @@ sub inflate {
       my $interval = $member_config{interval} // $self->default_interval;
       my $timeout  = $member_config{timeout}  // $self->default_timeout;
 
+      my $tester_id = join ':', $id, $self->id, $member->id;
+
       my $tester = Hello::Config::Tester->new(
         world => $self->world,
         class => $config->{class},
-        id    => "$id:".$member->id,
+        id    => $tester_id,
         args  => {
           defined_kv(interval => $interval),
           defined_kv(timeout  => $timeout),
