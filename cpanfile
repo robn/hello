@@ -13,6 +13,7 @@ requires "MIME::Base64" => "0";
 requires "Module::Runtime" => "0";
 requires "Moo" => "0";
 requires "Moo::Role" => "0";
+requires "Net::Async::Consul" => "0";
 requires "Net::Async::HTTP" => "0";
 requires "Net::Async::HTTP::Server::PSGI" => "0";
 requires "Net::Async::Ping" => "0";
