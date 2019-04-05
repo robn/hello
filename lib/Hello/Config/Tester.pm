@@ -1,11 +1,9 @@
 package Hello::Config::Tester;
 
 use 5.020;
-use warnings;
-use strict;
+use Moo;
 use experimental qw(postderef);
 
-use Moo;
 use Types::Standard qw(Str HashRef);
 use Type::Utils qw(class_type);
 

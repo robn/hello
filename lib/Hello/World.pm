@@ -1,11 +1,9 @@
 package Hello::World;
 
 use 5.020;
-use warnings;
-use strict;
+use Moo;
 use experimental qw(postderef);
 
-use Moo;
 use Types::Standard qw(Object Str);
 use Type::Utils qw(class_type role_type);
 use Type::Params qw(compile);
