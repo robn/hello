@@ -61,7 +61,7 @@ sub inflate {
 }
 
 sub _change_handler {
-  my ($self, $nodes, $meta) = @_;
+  my ($self, $services, $meta) = @_;
 
   # no change, timeout or other thing, just go back to sleep
   if ($meta->index == $self->_index) {
@@ -74,15 +74,15 @@ sub _change_handler {
 
   my %new_registered;
 
-  for my $node ($nodes->@*) {
+  for my $service ($services->@*) {
 
     for my $id (keys $self->tester->%*) {
       my $config = $self->tester->{$id} // {};
 
       my %member_config = %$config;
-      $member_config{ip} = $node->address;
+      $member_config{ip} = $service->address;
 
-      my $tester_id = join ':', $id, $self->id, $node->node, $node->name;
+      my $tester_id = join ':', $id, $self->id, $service->node, $service->name;
 
       my $tester = Hello::Config::Tester->new(
         world => $self->world,
