@@ -22,6 +22,7 @@
 [group.disco]
   class = "Hello::Group::Consul"
   service = "myservice"
+  prefix  = "hello"
 
   [group.disco.tester]
     ping = {
