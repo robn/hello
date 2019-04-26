@@ -186,12 +186,16 @@ sub _update_testers {
       my $config = $self->tester->{$id} // {};
 
       my %member_config = %$config;
-      $member_config{ip} = $service->address;
+      $member_config{ip} = $service->service_address || $service->address;
 
-      my $kv_config = $service_args->{$service->node}->{$service->name} // {};
+      my $kv_config =
+        $service_args->{$service->node}->{$service->id} //
+        $service_args->{$service->node}->{$service->name} //
+        {};
       $member_config{$_} = $kv_config->{$_} for keys %$kv_config;
 
-      my $tester_id = join ':', $id, $self->id, $service->node, $service->name;
+      my $service_id = $service->id || $service->name;
+      my $tester_id = join ':', $id, $self->id, $service->node, $service_id;
 
       my $tester = Hello::Config::Tester->new(
         world => $self->world,
