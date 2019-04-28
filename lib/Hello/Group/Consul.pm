@@ -186,8 +186,10 @@ sub _update_testers {
       my $config = $self->tester->{$id} // {};
 
       my %member_config = %$config;
-      $member_config{ip} = $service->service_address || $service->address;
-      $member_config{port} = $service->port if $service->port;
+      $member_config{ip} = $service->service_address || $service->address
+        if !$member_config{ip};
+      $member_config{port} = $service->port
+        if !$member_config{port} && $service->port;
 
       my $kv_config =
         $service_args->{$service->node}->{$service->id} //
