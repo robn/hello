@@ -7,6 +7,8 @@ use strict;
 use Moo;
 with 'Hello::Tester';
 
+sub description { "always fail" }
+
 sub test {
   return Future->fail("failures gotta fail");
 }

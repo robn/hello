@@ -30,7 +30,7 @@ has logger => (
   },
 );
 
-requires qw(test);
+requires qw(test description);
 
 sub test_result {
   my ($self) = @_;

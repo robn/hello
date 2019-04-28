@@ -11,6 +11,13 @@ use Types::Standard qw(Str HashRef);
 
 use Net::Async::HTTP;
 
+sub description { shift->_description }
+has _description => (
+  is  => 'lazy',
+  isa => Str,
+  default => sub { sprintf "HTTP GET %s", shift->url },
+);
+
 has url => ( is => 'ro', isa => Str, required => 1 );
 
 has headers => ( is => 'ro', isa => HashRef[Str], default => sub { {} } );

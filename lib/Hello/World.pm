@@ -51,7 +51,7 @@ sub add_tester {
   $tester->alive(1);
 
   try_repeat {
-    $tester->logger->log("starting");
+    $tester->logger->log(["starting: %s", $tester->description]);
     $tester->test_result
       ->then(sub {
         my ($result) = @_;
