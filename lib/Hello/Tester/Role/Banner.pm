@@ -27,6 +27,7 @@ sub wrap_banner {
     $self->loop->add($h);
     $h->read_until(qr/$re/)->then(sub {
       my ($read, $eof) = @_;
+      $h->close_now;
       $eof ? $self->loop->new_future->fail_later('EOF') : $self->loop->new_future->done_later;
     });
   });

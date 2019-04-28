@@ -42,6 +42,7 @@ sub wrap_imap {
       $s->read_until(qr/\r\n/);
     })->then(sub {
       my ($line) = @_;
+      $s->close_now;
       return Future->done unless $self->username;
       $line =~ m/^\. OK / ?
         Future->done :
