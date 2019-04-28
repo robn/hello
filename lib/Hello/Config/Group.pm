@@ -23,7 +23,14 @@ has args  => ( is => 'ro', isa => HashRef, default => sub { {} } );
 
 sub inflate {
   my ($self) = @_;
-  require_module($self->class); # XXX fail
+
+  eval {
+    require_module($self->class);
+  };
+  if (my $err = $@) {
+    $Logger->log(["couldn't require group module %s: %s", $self->class, $err]);
+    return;
+  }
 
   my $group = $self->class->new(
     world => $self->world,
