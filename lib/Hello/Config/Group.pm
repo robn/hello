@@ -32,11 +32,17 @@ sub inflate {
     return;
   }
 
-  my $group = $self->class->new(
-    world => $self->world,
-    id    => $self->id,
-    $self->args->%*,
-  );
+  my $group = eval {
+    $self->class->new(
+      world => $self->world,
+      id    => $self->id,
+      $self->args->%*,
+    );
+  };
+  if (my $err = $@) {
+    $Logger->log(["couldn't instantiate group module %s (for %s): %s", $self->class, $self->id, $err]);
+    return;
+  }
 
   $group->inflate;
 }

@@ -3,21 +3,21 @@
   ip = "127.0.0.1"
   port = 9200
 
-[group.static]
-  class = "Hello::Group::Static"
-
-  [group.static.tester]
-    ping = {
-      class = "Hello::Tester::Ping",
-      interval = 5
-    }
-
-  [[group.static.members]]
-    id = "local"
-    ip = "127.0.0.1"
-  [[group.static.members]]
-    id = "local2"
-    ip = "127.0.0.2"
+#[group.static]
+#  class = "Hello::Group::Static"
+#
+#  [group.static.tester]
+#    ping = {
+#      class = "Hello::Tester::Ping",
+#      interval = 5
+#    }
+#
+#  [[group.static.members]]
+#    id = "local"
+#    ip = "127.0.0.1"
+#  [[group.static.members]]
+#    id = "local2"
+#    ip = "127.0.0.2"
 
 [group.disco]
   class = "Hello::Group::Consul"

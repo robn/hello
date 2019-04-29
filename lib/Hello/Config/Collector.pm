@@ -29,11 +29,17 @@ sub inflate {
     return;
   }
 
-  my $collector = $self->class->new(
-    loop => $self->world->loop,
-    id   => $self->id,
-    $self->args->%*,
-  );
+  my $collector = eval {
+    $self->class->new(
+      loop => $self->world->loop,
+      id   => $self->id,
+      $self->args->%*,
+    );
+  };
+  if (my $err = $@) {
+    $Logger->log(["couldn't instantiate collector module %s (for %s): %s", $self->class, $self->id, $err]);
+    return;
+  }
 
   $self->world->add_collector($collector);
 }

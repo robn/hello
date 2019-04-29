@@ -29,11 +29,17 @@ sub inflate {
     return;
   }
 
-  my $tester = $self->class->new(
-    loop => $self->world->loop,
-    id   => $self->id,
-    $self->args->%*,
-  );
+  my $tester = eval {
+    $self->class->new(
+      loop => $self->world->loop,
+      id   => $self->id,
+      $self->args->%*,
+    );
+  };
+  if (my $err = $@) {
+    $Logger->log(["couldn't instantiate tester module %s (for %s): %s", $self->class, $self->id, $err]);
+    return;
+  }
 
   $self->world->add_tester($tester);
 }
