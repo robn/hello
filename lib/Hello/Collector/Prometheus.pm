@@ -58,7 +58,11 @@ sub init {
   my $http = Net::Async::HTTP::Server::PSGI->new(
     app => Plack::Middleware::AccessLog->wrap(
       $self->_prom_client->psgi,
-      logger => $Logger,
+      logger => sub {
+        my $msg = join '', @_;
+        chomp $msg;
+        $Logger->log("access: $msg");
+      },
     ),
   );
   $self->loop->add($http);
