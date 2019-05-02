@@ -262,7 +262,7 @@ sub _update_testers {
       $member_config{$_} = $kv_config->{$_} for keys %$kv_config;
 
       my $service_id = $service->id || $service->name;
-      my $tester_id = join ':', $id, $self->group->id, $service->node, $service_id;
+      my $tester_id = join ':', $id, $self->group->id, $self->datacenter, $service->node, $service_id;
 
       my $tester = Hello::Config::Tester->new(
         world => $self->group->world,
