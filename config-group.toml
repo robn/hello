@@ -23,6 +23,7 @@
   class = "Hello::Group::Consul"
   service = "myservice"
   prefix  = "hello"
+  all_datacenters = true
 
   [group.disco.tester]
     ping = {

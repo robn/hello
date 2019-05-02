@@ -4,14 +4,10 @@ use 5.020;
 use Moo;
 use experimental qw(postderef);
 
-use Types::Standard qw(Int Str ArrayRef HashRef);
+use Types::Standard qw(Int Str Bool ArrayRef HashRef);
 use Type::Utils qw(class_type);
 
-use Scalar::Util qw(blessed);
-use Defined::KV;
-
 use Hello::World;
-use Hello::Logger '$Logger';
 
 use Net::Async::Consul;
 
@@ -22,6 +18,12 @@ has id => ( is => 'ro', isa => Str, required => 1 );
 has service => ( is => 'ro', isa => Str, required => 1 );
 has prefix =>  ( is => 'ro', isa => Str );
 
+has all_datacenters => (
+  is      => 'ro',
+  isa     => Bool,
+  coerce  => sub { $_[0] && ("$_[0]" ne "false") },
+);
+
 has default_interval => ( is => 'ro', isa => Int, default => sub { 120 } );
 has default_timeout  => ( is => 'ro', isa => Int, default => sub { 30 } );
 
@@ -31,10 +33,66 @@ has tester => (
   default => sub { {} },
 );
 
+
+sub inflate {
+  my ($self) = @_;
+
+  my $c = Net::Async::Consul->new(loop => $self->world->loop);
+
+  if ($self->all_datacenters) {
+    $c->catalog->datacenters(
+      cb => sub {
+        my ($dcs) = @_;
+        Hello::Group::Consul::Worker->new(
+          group => $self,
+          datacenter => $_,
+        )->inflate for @$dcs;
+      },
+    );
+  }
+
+  else {
+    $c->agent->self(
+      cb => sub {
+        my ($data) = @_;
+        Hello::Group::Consul::Worker->new(
+          group => $self,
+          datacenter => $data->config->{Datacenter},
+        )->inflate;
+      },
+    );
+  }
+}
+
+sub _catalog_start {
+  my ($self) = @_;
+
+}
+
+
+package
+  Hello::Group::Consul::Worker;
+
+use 5.020;
+use Moo;
+use experimental qw(postderef);
+
+use Types::Standard qw(Int Str ArrayRef HashRef);
+use Type::Utils qw(class_type);
+
+use Defined::KV;
+
+has group => ( is => 'ro', isa => class_type('Hello::Group::Consul'), required => 1 );
+
+has datacenter => ( is => 'ro', isa => Str, required => 1 );
+
 has logger => (
   is => 'lazy',
   default => sub {
-    Hello::Logger->current_logger->proxy({ proxy_prefix => shift->id.': ' })
+    my ($self) = @_;
+    Hello::Logger->current_logger->proxy({
+      proxy_prefix => $self->group->id.': '.$self->datacenter.': ',
+    });
   },
 );
 
@@ -42,7 +100,7 @@ has _catalog => (
   is => 'lazy',
   default => sub {
     my ($self) = @_;
-    Net::Async::Consul->catalog(loop => $self->world->loop);
+    Net::Async::Consul->catalog(loop => $self->group->world->loop);
   },
 );
 has _catalog_index    => ( is => 'rw', isa => Int, default => 0);
@@ -52,7 +110,7 @@ has _kv => (
   is => 'lazy',
   default => sub {
     my ($self) = @_;
-    Net::Async::Consul->kv(loop => $self->world->loop);
+    Net::Async::Consul->kv(loop => $self->group->world->loop);
   },
 );
 has _kv_index        => ( is => 'rw', isa => Int, default => 0);
@@ -70,8 +128,11 @@ sub inflate {
 sub _catalog_start {
   my ($self) = @_;
 
+  $self->logger->log(["starting catalog receiver for %s", $self->datacenter]);
+
   $self->_catalog->service(
-    $self->service,
+    $self->group->service,
+    datacenter => $self->datacenter,
     index => $self->_catalog_index,
     wait => '10s',
     cb => sub { $self->_catalog_change_handler(@_) },
@@ -88,7 +149,7 @@ sub _catalog_change_handler {
     return;
   }
 
-  $self->logger->log(["consul: catalog change (index %d -> %d)", $self->_catalog_index, $meta->index]);
+  $self->logger->log(["catalog change (index %d -> %d)", $self->_catalog_index, $meta->index]);
   $self->_catalog_index($meta->index);
   $self->_catalog_services($services);
 
@@ -116,9 +177,12 @@ sub _catalog_error_handler {
 sub _kv_start {
   my ($self) = @_;
 
-  if (defined $self->prefix) {
+  $self->logger->log(["starting kv receiver for %s", $self->datacenter]);
+
+  if (defined $self->group->prefix) {
     $self->_kv->get_all(
-      $self->prefix,
+      $self->group->prefix,
+      datacenter => $self->datacenter,
       index => $self->_kv_index,
       wait => '10s',
       cb => sub { $self->_kv_change_handler(@_) },
@@ -136,11 +200,11 @@ sub _kv_change_handler {
     return;
   }
 
-  $self->logger->log(["consul: kv change (index %d -> %d)", $self->_kv_index, $meta->index]);
+  $self->logger->log(["kv change (index %d -> %d)", $self->_kv_index, $meta->index]);
   $self->_kv_index($meta->index);
 
   my %service_args;
-  my $prefix = $self->prefix;
+  my $prefix = $self->group->prefix;
   for my $kv ($data->@*) {
     my $k = $kv->key =~ s{^$prefix/}{}r;
     my ($node, $service, $arg, @rest) = split '/', $k;
@@ -176,14 +240,14 @@ sub _update_testers {
   my $services = $self->_catalog_services;
   my $service_args = $self->_kv_service_args;
 
-  return unless $services && ($service_args || !defined $self->prefix);
+  return unless $services && ($service_args || !defined $self->group->prefix);
 
   my %new_registered;
 
   for my $service ($services->@*) {
 
-    for my $id (keys $self->tester->%*) {
-      my $config = $self->tester->{$id} // {};
+    for my $id (keys $self->group->tester->%*) {
+      my $config = $self->group->tester->{$id} // {};
 
       my %member_config = %$config;
       $member_config{ip} = $service->service_address || $service->address
@@ -198,15 +262,15 @@ sub _update_testers {
       $member_config{$_} = $kv_config->{$_} for keys %$kv_config;
 
       my $service_id = $service->id || $service->name;
-      my $tester_id = join ':', $id, $self->id, $service->node, $service_id;
+      my $tester_id = join ':', $id, $self->group->id, $service->node, $service_id;
 
       my $tester = Hello::Config::Tester->new(
-        world => $self->world,
+        world => $self->group->world,
         class => $config->{class},
         id    => $tester_id,
         args  => {
-          defined_kv(interval => $self->default_interval),
-          defined_kv(timeout  => $self->default_timeout),
+          defined_kv(interval => $self->group->default_interval),
+          defined_kv(timeout  => $self->group->default_timeout),
           map { $_ => $member_config{$_} }
             grep { ! m/^(?:world|class|args)$/ }
               keys %member_config,
@@ -221,8 +285,8 @@ sub _update_testers {
 
   for my $tester_id (sort keys $self->_registered_testers->%*) {
     next if exists $new_registered{$tester_id};
-    $Logger->log("removing tester for lost service: $tester_id");
-    $self->world->remove_tester($tester_id);
+    $self->logger->log("removing tester for lost service: $tester_id");
+    $self->group->world->remove_tester($tester_id);
   }
   $self->_registered_testers(\%new_registered);
 }
