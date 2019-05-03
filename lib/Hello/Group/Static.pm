@@ -31,8 +31,8 @@ sub inflate {
   for my $member ($self->members->@*) {
     my $member_args = $member->args;
 
-    for my $id (keys $self->tester->%*) {
-      my $config = $self->tester->{$id} // {};
+    for my $id (keys $self->template->%*) {
+      my $config = $self->template->{$id} // {};
 
       my %member_config = (%$config, %$member_args);
       my $interval = $member_config{interval} // $self->default_interval;

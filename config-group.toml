@@ -6,8 +6,14 @@
 [group.static]
   class = "Hello::Group::Static"
 
-  [group.static.tester]
+  [group.static.template]
     ping = {
+      class = "Hello::Tester::Ping",
+      interval = 5
+    }
+
+  [group.static.template]
+    hoy = {
       class = "Hello::Tester::Ping",
       interval = 5
     }
@@ -25,7 +31,7 @@
   prefix  = "hello"
   all_datacenters = true
 
-  [group.disco.tester]
+  [group.disco.template]
     ping = {
       class = "Hello::Tester::Ping",
       interval = 5

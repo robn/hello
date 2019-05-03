@@ -237,8 +237,8 @@ sub _update_testers {
 
   for my $service ($services->@*) {
 
-    for my $id (keys $self->group->tester->%*) {
-      my $config = $self->group->tester->{$id} // {};
+    for my $id (keys $self->group->template->%*) {
+      my $config = $self->group->template->{$id} // {};
 
       my %member_config = %$config;
       $member_config{ip} = $service->service_address || $service->address
