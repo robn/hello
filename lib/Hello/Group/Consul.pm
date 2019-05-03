@@ -4,7 +4,9 @@ use 5.020;
 use Moo;
 use experimental qw(postderef);
 
-use Types::Standard qw(Int Str Bool ArrayRef HashRef);
+with 'Hello::Group';
+
+use Types::Standard qw(Str Bool);
 use Type::Utils qw(class_type);
 
 use Hello::World;
@@ -13,8 +15,6 @@ use Net::Async::Consul;
 
 has world => ( is => 'ro', isa => class_type('Hello::World'), required => 1 );
 
-has id => ( is => 'ro', isa => Str, required => 1 );
-
 has service => ( is => 'ro', isa => Str, required => 1 );
 has prefix =>  ( is => 'ro', isa => Str );
 
@@ -22,15 +22,6 @@ has all_datacenters => (
   is      => 'ro',
   isa     => Bool,
   coerce  => sub { $_[0] && ("$_[0]" ne "false") },
-);
-
-has default_interval => ( is => 'ro', isa => Int, default => sub { 120 } );
-has default_timeout  => ( is => 'ro', isa => Int, default => sub { 30 } );
-
-has tester => (
-  is      => 'ro',
-  isa     => HashRef[],   # XXX HashRef[class_type('Hello::Config::Tester'] ?
-  default => sub { {} },
 );
 
 

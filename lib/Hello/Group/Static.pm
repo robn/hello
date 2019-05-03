@@ -4,7 +4,9 @@ use 5.020;
 use Moo;
 use experimental qw(postderef);
 
-use Types::Standard qw(Int Str ArrayRef HashRef);
+with 'Hello::Group';
+
+use Types::Standard qw(ArrayRef);
 use Type::Utils qw(class_type);
 
 use Scalar::Util qw(blessed);
@@ -14,11 +16,6 @@ use Hello::World;
 
 has world => ( is => 'ro', isa => class_type('Hello::World'), required => 1 );
 
-has id => ( is => 'ro', isa => Str, required => 1 );
-
-has default_interval => ( is => 'ro', isa => Int, default => sub { 120 } );
-has default_timeout  => ( is => 'ro', isa => Int, default => sub { 30 } );
-
 has members => (
   is      => 'ro',
   isa     => ArrayRef[class_type('Hello::Group::Static::Member')],
@@ -26,12 +23,6 @@ has members => (
   coerce  => sub {
     [ map { blessed $_ ? $_ : Hello::Group::Static::Member->new(id => delete $_->{id}, args => $_ ) } $_[0]->@* ]
   },
-);
-
-has tester => (
-  is      => 'ro',
-  isa     => HashRef[],   # XXX HashRef[class_type('Hello::Config::Tester'] ?
-  default => sub { {} },
 );
 
 sub inflate {
