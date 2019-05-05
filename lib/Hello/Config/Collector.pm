@@ -16,7 +16,7 @@ has world => ( is => 'ro', isa => class_type('Hello::World'), required => 1 );
 has class => ( is => 'ro', isa => Str,                        required => 1 );
 has id    => ( is => 'ro', isa => Str,                        required => 1 );
 
-has args  => ( is => 'ro', isa => HashRef, default => sub { {} } );
+has config => ( is => 'ro', isa => HashRef, default => sub { {} } );
 
 sub inflate {
   my ($self) = @_;
@@ -33,7 +33,7 @@ sub inflate {
     $self->class->new(
       loop => $self->world->loop,
       id   => $self->id,
-      $self->args->%*,
+      $self->config->%*,
     );
   };
   if (my $err = $@) {

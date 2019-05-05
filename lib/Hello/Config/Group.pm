@@ -19,7 +19,7 @@ has id    => ( is => 'ro', isa => Str,                        required => 1 );
 has default_interval => ( is => 'ro', isa => Int );
 has default_timeout  => ( is => 'ro', isa => Int );
 
-has args  => ( is => 'ro', isa => HashRef, default => sub { {} } );
+has config => ( is => 'ro', isa => HashRef, default => sub { {} } );
 
 sub inflate {
   my ($self) = @_;
@@ -36,7 +36,7 @@ sub inflate {
     $self->class->new(
       world => $self->world,
       id    => $self->id,
-      $self->args->%*,
+      $self->config->%*,
     );
   };
   if (my $err = $@) {
@@ -44,7 +44,7 @@ sub inflate {
     return;
   }
 
-  $group->inflate;
+  $group->start;
 }
 
 1;
