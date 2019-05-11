@@ -6,7 +6,7 @@ use experimental qw(postderef);
 
 with 'Hello::Group';
 
-use Types::Standard qw(Str Bool);
+use Types::Standard qw(Str Bool Int);
 use Type::Utils qw(class_type);
 
 use Hello::World;
@@ -22,11 +22,16 @@ has all_datacenters => (
   coerce  => sub { $_[0] && ("$_[0]" ne "false") },
 );
 
+has _consul_port => ( is => 'ro', isa => Int, default => 8500 );
+
 
 sub start {
   my ($self) = @_;
 
-  my $c = Net::Async::Consul->new(loop => $self->world->loop);
+  my $c = Net::Async::Consul->new(
+    loop => $self->world->loop,
+    port => $self->_consul_port,
+  );
 
   if ($self->all_datacenters) {
     $c->catalog->datacenters(
@@ -89,7 +94,10 @@ has _catalog => (
   is => 'lazy',
   default => sub {
     my ($self) = @_;
-    Net::Async::Consul->catalog(loop => $self->group->world->loop);
+    Net::Async::Consul->catalog(
+      loop => $self->group->world->loop,
+      port => $self->group->_consul_port,
+    );
   },
 );
 has _catalog_index    => ( is => 'rw', isa => Int, default => 0);
@@ -99,7 +107,10 @@ has _kv => (
   is => 'lazy',
   default => sub {
     my ($self) = @_;
-    Net::Async::Consul->kv(loop => $self->group->world->loop);
+    Net::Async::Consul->kv(
+      loop => $self->group->world->loop,
+      port => $self->group->_consul_port,
+    );
   },
 );
 has _kv_index          => ( is => 'rw', isa => Int, default => 0);
