@@ -32,9 +32,13 @@ requires "strict" => "0";
 requires "warnings" => "0";
 
 on 'test' => sub {
+  requires "Consul" => "0";
   requires "File::Temp" => "0";
+  requires "IO::Async::Test" => "0";
   requires "IO::Socket::SSL::Utils" => "0";
   requires "Net::EmptyPort" => "0";
+  requires "Test::Consul" => "0.005";
+  requires "Test::Deep" => "0";
   requires "Test::More" => "0";
 };
 

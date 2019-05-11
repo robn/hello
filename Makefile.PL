@@ -53,20 +53,25 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Consul" => 0,
     "File::Temp" => 0,
+    "IO::Async::Test" => 0,
     "IO::Socket::SSL::Utils" => 0,
     "Net::EmptyPort" => 0,
+    "Test::Consul" => "0.005",
+    "Test::Deep" => 0,
     "Test::More" => 0
   },
   "VERSION" => "0.001",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/collector/*.t t/group/*.t t/tester/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Consul" => 0,
   "Date::Format" => 0,
   "Defined::KV" => 0,
   "File::Temp" => 0,
@@ -76,6 +81,7 @@ my %FallbackPrereqs = (
   "IO::Async::Loop" => 0,
   "IO::Async::SSL" => 0,
   "IO::Async::Stream" => 0,
+  "IO::Async::Test" => 0,
   "IO::Socket::SSL::Utils" => 0,
   "Log::Dispatchouli" => "2.002",
   "Log::Dispatchouli::Global" => 0,
@@ -92,6 +98,8 @@ my %FallbackPrereqs = (
   "Prometheus::Tiny" => "0.002",
   "Scalar::Util" => 0,
   "TOML" => 0,
+  "Test::Consul" => "0.005",
+  "Test::Deep" => 0,
   "Test::More" => 0,
   "Time::HiRes" => 0,
   "Type::Params" => 0,
