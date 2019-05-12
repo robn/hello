@@ -132,7 +132,7 @@ sub _catalog_start {
 
   $self->_catalog->service(
     $self->group->service,
-    datacenter => $self->datacenter,
+    dc => $self->datacenter,
     index => $self->_catalog_index,
     wait => '10s',
     cb => sub { $self->_catalog_change_handler(@_) },
@@ -182,7 +182,7 @@ sub _kv_start {
   if (defined $self->group->prefix) {
     $self->_kv->get_all(
       $self->group->prefix,
-      datacenter => $self->datacenter,
+      dc => $self->datacenter,
       index => $self->_kv_index,
       wait => '10s',
       cb => sub { $self->_kv_change_handler(@_) },
