@@ -256,7 +256,7 @@ sub _update_membership {
       ($service->port ? (port => $service->port) : ()),
     );
 
-    my $member_id = join ':', $self->datacenter, $service->id;
+    my $member_id = join ':', $self->datacenter, $service->node, $service->id;
 
     $self->group->add_member(
       Hello::Group::Member->new(
