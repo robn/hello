@@ -53,7 +53,7 @@ $consul->agent->service_register(
   )
 );
 
-wait_for { scalar keys($world->_testers->%*) == 3 };
+wait_for { scalar keys($world->_testers->%*) > 0 };
 is(scalar keys($world->_testers->%*), 3, "testers created after registering service");
 
 cmp_deeply(
