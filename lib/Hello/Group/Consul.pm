@@ -42,6 +42,7 @@ sub start {
           datacenter => $_,
         )->inflate for @$dcs;
       },
+      error_cb => sub { $self->_start_error_handler(@_) },
     );
   }
 
@@ -54,13 +55,25 @@ sub start {
           datacenter => $data->config->{Datacenter},
         )->inflate;
       },
+      error_cb => sub { $self->_start_error_handler(@_) },
     );
   }
 }
 
-sub _catalog_start {
-  my ($self) = @_;
+sub _start_error_handler {
+  my ($self, $msg) = @_;
 
+  $self->logger->log("consul: startup error (dc lookup): $msg");
+  $self->logger->log("consul: will retry in 10s");
+
+  my $timer = IO::Async::Timer::Countdown->new(
+    delay => 10,
+    on_expire => sub {
+      $self->start;
+    },
+  );
+  $timer->start;
+  $self->world->loop->add($timer);
 }
 
 
