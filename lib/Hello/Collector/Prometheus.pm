@@ -30,7 +30,9 @@ has _prom_client => ( is => 'ro', isa => class_type('Prometheus::Tiny'),
                           );
                         }
 
-                        for my $metric (qw(run_time_seconds last_time last_success_time last_fail_time last_timeout_time)) {
+                        for my $metric (qw(run_time_seconds last_time
+                                           last_success_time last_fail_time last_timeout_time
+                                           success fail timeout)) {
                           $prom->declare(
                             "hello_test_$metric",
                             help => $metric, # XXX
@@ -99,15 +101,30 @@ sub collect {
   if ($result->is_success) {
     $prom->inc('hello_test_success_total', \%labels);
     $prom->set('hello_test_last_success_time', $time, \%labels);
+
+    $prom->set('hello_test_success', 1, \%labels);
+    $prom->set('hello_test_fail',    0, \%labels);
+    $prom->set('hello_test_timeout', 0, \%labels);
   }
+
   elsif ($result->is_fail) {
     $prom->inc('hello_test_fail_total', \%labels);
     $prom->set('hello_test_last_fail_time', $time, \%labels);
+
+    $prom->set('hello_test_success', 0, \%labels);
+    $prom->set('hello_test_fail',    1, \%labels);
+    $prom->set('hello_test_timeout', 0, \%labels);
   }
+
   elsif ($result->is_timeout) {
     $prom->inc('hello_test_timeout_total', \%labels);
     $prom->set('hello_test_last_timeout_time', $time, \%labels);
+
+    $prom->set('hello_test_success', 0, \%labels);
+    $prom->set('hello_test_fail',    0, \%labels);
+    $prom->set('hello_test_timeout', 1, \%labels);
   }
+
   else {
     die "result in an impossible state?";
   }

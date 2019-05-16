@@ -48,6 +48,10 @@ subtest "recording a success result" => sub {
   like($out, qr/^hello_test_run_time_seconds\{id="test1"}\s+3$/m, "found run time");
   like($out, qr/^hello_test_last_time\{id="test1"}\s+5$/m, "found last end time");
   like($out, qr/^hello_test_last_success_time\{id="test1"}\s+5$/m, "found last success end time");
+
+  like($out, qr/^hello_test_success\{id="test1"}\s+1$/m, "success state set");
+  like($out, qr/^hello_test_fail\{id="test1"}\s+0$/m, "fail state not set");
+  like($out, qr/^hello_test_timeout\{id="test1"}\s+0$/m, "timeout state not set");
 };
 
 subtest "fail result" => sub {
@@ -64,6 +68,10 @@ subtest "fail result" => sub {
   like($out, qr/^hello_test_run_time_seconds\{id="test2"}\s+5$/m, "found run time");
   like($out, qr/^hello_test_last_time\{id="test2"}\s+9$/m, "found last end time");
   like($out, qr/^hello_test_last_fail_time\{id="test2"}\s+9$/m, "found last fail end time");
+
+  like($out, qr/^hello_test_success\{id="test2"}\s+0$/m, "success state not set");
+  like($out, qr/^hello_test_fail\{id="test2"}\s+1$/m, "fail state set");
+  like($out, qr/^hello_test_timeout\{id="test2"}\s+0$/m, "timeout state not set");
 };
 
 subtest "timeout result" => sub {
@@ -80,6 +88,10 @@ subtest "timeout result" => sub {
   like($out, qr/^hello_test_run_time_seconds\{id="test3"}\s+7$/m, "found run time");
   like($out, qr/^hello_test_last_time\{id="test3"}\s+13$/m, "found last end time");
   like($out, qr/^hello_test_last_timeout_time\{id="test3"}\s+13$/m, "found last timeout end time");
+
+  like($out, qr/^hello_test_success\{id="test3"}\s+0$/m, "success state not set");
+  like($out, qr/^hello_test_fail\{id="test3"}\s+0$/m, "fail state not set");
+  like($out, qr/^hello_test_timeout\{id="test3"}\s+1$/m, "timeout state set");
 };
 
 done_testing;
