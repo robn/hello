@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 use Moo;
-use Types::Standard qw(Str Enum Num Bool);
+use Types::Standard qw(Str Enum Num Bool HashRef);
 use Type::Utils qw(role_type);
 
 has id   => ( is => 'ro', isa => Str, required => 1 );
@@ -16,6 +16,8 @@ has reason => ( is => 'ro', isa => Str, default => sub { '' } );
 
 has start   => ( is => 'ro', isa => Num, required => 1 );
 has elapsed => ( is => 'ro', isa => Num, required => 1 );
+
+has tags => ( is => 'ro', isa => HashRef[Str], default => sub { {} } );
 
 has is_success => ( is => 'lazy', isa => Bool, default => sub { shift->state eq 'SUCCESS' } );
 has is_fail    => ( is => 'lazy', isa => Bool, default => sub { shift->state eq 'FAIL'    } );

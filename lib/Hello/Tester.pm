@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 use Moo::Role;
-use Types::Standard qw(Int Str Bool);
+use Types::Standard qw(Int Str Bool HashRef);
 use Type::Utils qw(class_type);
 
 use Future;
@@ -20,6 +20,8 @@ has id   => ( is => 'ro', isa => Str, required => 1 );
 
 has interval => ( is => 'ro', isa => Int, default => sub { 120 } );
 has timeout  => ( is => 'ro', isa => Int, default => sub { 30 } );
+
+has tags => ( is => 'ro', isa => HashRef[Str], default => sub { {} } );
 
 has alive => ( is => 'rw', isa => Bool, default => sub { 0 } );
 
@@ -45,6 +47,7 @@ sub test_result {
           start   => $tv_start->[0] + $tv_start->[1] / 1_000_000,
           elapsed => tv_interval($tv_start),
           id      => $self->id,
+          tags    => $self->tags,
         ));
       })
       ->else(sub {
@@ -55,6 +58,7 @@ sub test_result {
           start   => $tv_start->[0] + $tv_start->[1] / 1_000_000,
           elapsed => tv_interval($tv_start),
           id      => $self->id,
+          tags    => $self->tags,
         ));
       }),
     $self->loop->timeout_future(after => $self->timeout)
@@ -64,6 +68,7 @@ sub test_result {
           start   => $tv_start->[0] + $tv_start->[1] / 1_000_000,
           elapsed => tv_interval($tv_start),
           id      => $self->id,
+          tags    => $self->tags,
         ));
       }),
   )
