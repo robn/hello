@@ -94,4 +94,30 @@ subtest "timeout result" => sub {
   like($out, qr/^hello_test_timeout\{id="test3"}\s+1$/m, "timeout state set");
 };
 
+subtest "tags as labels" => sub {
+  $c->collect(Hello::Result->new(
+    id      => 'test4',
+    state   => 'SUCCESS',
+    start   => 1,
+    elapsed => 1,
+    tags    => {
+      foo => 'bar',
+      baz => 'quux',
+    },
+  ));
+
+  my $res = $http->do_request(uri => $uri)->get;
+  my $out = $res->decoded_content;
+
+  like($out, qr/^hello_test_total\{hello_baz="quux",hello_foo="bar",id="test4"}\s+1$/m, "found record");
+  like($out, qr/^hello_test_success_total\{hello_baz="quux",hello_foo="bar",id="test4"}\s+1$/m, "found success record");
+  like($out, qr/^hello_test_run_time_seconds\{hello_baz="quux",hello_foo="bar",id="test4"}\s+1$/m, "found run time");
+  like($out, qr/^hello_test_last_time\{hello_baz="quux",hello_foo="bar",id="test4"}\s+2$/m, "found last end time");
+  like($out, qr/^hello_test_last_success_time\{hello_baz="quux",hello_foo="bar",id="test4"}\s+2$/m, "found last success end time");
+
+  like($out, qr/^hello_test_success\{hello_baz="quux",hello_foo="bar",id="test4"}\s+1$/m, "success state set");
+  like($out, qr/^hello_test_fail\{hello_baz="quux",hello_foo="bar",id="test4"}\s+0$/m, "fail state not set");
+  like($out, qr/^hello_test_timeout\{hello_baz="quux",hello_foo="bar",id="test4"}\s+0$/m, "timeout state not set");
+};
+
 done_testing;

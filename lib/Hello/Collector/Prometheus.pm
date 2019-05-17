@@ -91,7 +91,8 @@ sub collect {
 
   my $prom = $self->_prom_client;
 
-  my %labels = ( id => $result->id );
+  my $tags = $result->tags;
+  my %labels = ( id => $result->id, map { ("hello_$_" => $tags->{$_}) } keys %$tags );
 
   my $time = int($result->start + $result->elapsed);
 
