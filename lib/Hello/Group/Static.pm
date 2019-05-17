@@ -19,7 +19,10 @@ has members => (
   isa     => ArrayRef[class_type('Hello::Group::Member')],
   default => sub { [] },
   coerce  => sub {
-    [ map { blessed $_ ? $_ : Hello::Group::Member->new(id => delete $_->{id}, config => $_ ) } $_[0]->@* ]
+    [ map { blessed $_ ? $_ : Hello::Group::Member->new(
+                                id     => delete $_->{id},
+                                defined_kv(tags => delete $_->{tags}),
+                                config => $_ ) } $_[0]->@* ]
   },
 );
 

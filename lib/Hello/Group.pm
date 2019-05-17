@@ -85,9 +85,10 @@ sub inflate_from_membership {
         world   => $self->world,
         class   => $template->class,
         id      => $tester_id,
+        tags    => $member->tags,
         config  => {
           map { $_ => $final_config{$_} }
-            grep { ! m/^(?:world|class|id|config)$/ }
+            grep { ! m/^(?:world|class|id|tags|config)$/ }
               keys %final_config,
         },
       );
@@ -128,6 +129,8 @@ use Types::Standard qw(Str HashRef);
 
 has id     => ( is => 'ro', isa => Str, required => 1 );
 has config => ( is => 'ro', isa => HashRef, default => sub { {} } );
+
+has tags   => ( is => 'ro', isa => HashRef[Str], default => sub { {} } );
 
 
 1;

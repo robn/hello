@@ -18,6 +18,8 @@ has id    => ( is => 'ro', isa => Str,                        required => 1 );
 
 has config => ( is => 'ro', isa => HashRef, default => sub { {} } );
 
+has tags => ( is => 'ro', isa => HashRef[Str], default => sub { {} } );
+
 sub inflate {
   my ($self) = @_;
 
@@ -33,6 +35,7 @@ sub inflate {
     $self->class->new(
       loop => $self->world->loop,
       id   => $self->id,
+      tags => $self->tags,
       $self->config->%*,
     );
   };
