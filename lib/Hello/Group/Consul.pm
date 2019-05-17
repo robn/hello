@@ -275,6 +275,11 @@ sub _update_membership {
       Hello::Group::Member->new(
         id => $member_id,
         config => \%config,
+        tags => {
+          dc      => $self->datacenter,
+          node    => $service->node,
+          service => $service->id,
+        },
       )
     );
 
