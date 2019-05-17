@@ -33,7 +33,13 @@ cmp_deeply(
   {
     'tester1:group1:member1' => all(
       isa('Hello::Tester::True'),
-      methods(tags => { foo => "bar", baz => "quux" }),
+      methods(tags => {
+        group    => 'group1',
+        member   => 'member1',
+        template => 'tester1',
+        foo      => "bar",
+        baz      => "quux",
+      }),
     ),
   },
   'member tags appear on composed tester',

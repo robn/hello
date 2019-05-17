@@ -81,11 +81,18 @@ sub inflate_from_membership {
 
       my $tester_id = join ':', $template_id, $self->id, $member->id;
 
+      my %tester_tags = (
+        template => $template_id,
+        group    => $self->id,
+        member   => $member->id,
+        $member->tags->%*,
+      );
+
       my $tester = Hello::Config::Tester->new(
         world   => $self->world,
         class   => $template->class,
         id      => $tester_id,
-        tags    => $member->tags,
+        tags    => \%tester_tags,
         config  => {
           map { $_ => $final_config{$_} }
             grep { ! m/^(?:world|class|id|tags|config)$/ }
