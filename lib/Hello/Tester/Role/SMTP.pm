@@ -10,18 +10,9 @@ use Types::Standard qw(Str);
 use MIME::Base64 qw(encode_base64);
 use Carp qw(croak);
 
-has username => ( is => 'ro', isa => Str );
-has password => ( is => 'ro', isa => Str );
+with 'Hello::Tester::Role::UsernameAndPassword';
 
 requires qw(loop);
-
-sub BUILD {
-  my ($self, $args) = @_;
-  croak "username supplied without password"
-    if defined $self->username && !defined $self->password;
-  croak "password supplied without username"
-    if defined $self->password && !defined $self->username;
-}
 
 sub wrap_smtp {
   my ($self, $f) = @_;

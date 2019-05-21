@@ -9,18 +9,9 @@ use Types::Standard qw(Str);
 
 use Carp qw(croak);
 
-has username => ( is => 'ro', isa => Str );
-has password => ( is => 'ro', isa => Str );
+with 'Hello::Tester::Role::UsernameAndPassword';
 
 requires qw(loop);
-
-sub BUILD {
-  my ($self, $args) = @_;
-  croak "username supplied without password"
-    if defined $self->username && !defined $self->password;
-  croak "password supplied without username"
-    if defined $self->password && !defined $self->username;
-}
 
 sub wrap_imap {
   my ($self, $f) = @_;
