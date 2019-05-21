@@ -37,7 +37,7 @@ cmp_deeply(
   {
     'tester1:group1:member1' => all(
       isa('Hello::Tester::True'),
-      methods(interval => 5, timeout => 30),
+      methods(interval => 10, timeout => 30),
     ),
     'tester1:group1:member2' => all(
       isa('Hello::Tester::True'),
@@ -57,7 +57,7 @@ cmp_deeply(
     ),
     'tester2:group1:member3' => all(
       isa('Hello::Tester::False'),
-      methods(interval => 120, timeout => 20),
+      methods(interval => 120, timeout => 10),
     ),
     'tester3:group1:member1' => all(
       isa('Hello::Tester::Sleep'),

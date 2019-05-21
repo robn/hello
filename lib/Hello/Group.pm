@@ -75,8 +75,8 @@ sub inflate_from_membership {
       my %final_config = (
         interval => $self->default_interval,
         timeout  => $self->default_timeout,
+        %$member_config,
         $template->config->%*,
-        %$member_config
       );
 
       my $tester_id = join ':', $template_id, $self->id, $member->id;
