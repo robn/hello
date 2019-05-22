@@ -68,41 +68,45 @@ my $t404 = Hello::Tester::HTTP->new(
 
 ok($t404->test->else_done(1)->get, "request failed when endpoint not found");
 
-my $th = Hello::Tester::HTTP->new(
-  loop    => $loop,
-  id      => "http headers",
-  url     => "http://localhost:$port/headers",
-  headers => {
-    'X-Foo' => 'bar',
-  },
-);
+subtest 'tests with headers' => sub {
+  my $th = Hello::Tester::HTTP->new(
+    loop    => $loop,
+    id      => "http headers",
+    url     => "http://localhost:$port/headers",
+    headers => {
+      'X-Foo' => 'bar',
+    },
+  );
 
-ok($th->test->then_done(1)->get, "request with headers was passed correctly");
+  ok($th->test->then_done(1)->get, "request with headers was passed correctly");
 
-my $th400 = Hello::Tester::HTTP->new(
-  loop => $loop,
-  id   => "http no headers",
-  url  => "http://localhost:$port/headers",
-);
+  my $th400 = Hello::Tester::HTTP->new(
+    loop => $loop,
+    id   => "http no headers",
+    url  => "http://localhost:$port/headers",
+  );
 
-ok($th400->test->else_done(1)->get, "request with headers was passed correctly");
+  ok($th400->test->else_done(1)->get, "request with headers was passed correctly");
+};
 
-my $ta = Hello::Tester::HTTP->new(
-  loop     => $loop,
-  id       => "http auth",
-  url      => "http://localhost:$port/auth",
-  username => "someuser",
-  password => "somepass",
-);
+subtest 'tests with auth' => sub {
+  my $ta = Hello::Tester::HTTP->new(
+    loop     => $loop,
+    id       => "http auth",
+    url      => "http://localhost:$port/auth",
+    username => "someuser",
+    password => "somepass",
+  );
 
-ok($ta->test->then_done(1)->get, "request with auth was passed correctly");
+  ok($ta->test->then_done(1)->get, "request with auth was passed correctly");
 
-my $ta403 = Hello::Tester::HTTP->new(
-  loop     => $loop,
-  id       => "http no auth",
-  url      => "http://localhost:$port/auth",
-);
+  my $ta403 = Hello::Tester::HTTP->new(
+    loop     => $loop,
+    id       => "http no auth",
+    url      => "http://localhost:$port/auth",
+  );
 
-ok($ta403->test->else_done(1)->get, "request without auth was passed correctly");
+  ok($ta403->test->else_done(1)->get, "request without auth was passed correctly");
+};
 
 done_testing;
