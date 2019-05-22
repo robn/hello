@@ -8,6 +8,7 @@ use Test::More;
 use IO::Async::Loop;
 use Net::EmptyPort qw(empty_port);
 use Net::Async::HTTP::Server::PSGI;
+use MIME::Base64;
 
 use Hello::Tester::HTTP;
 
@@ -35,6 +36,12 @@ my $http = Net::Async::HTTP::Server::PSGI->new(
         return [ 200, [], [] ];
       }
       return [ 400, [], [] ];
+    }
+    if ($path =~   m/auth$/) {
+      if (($env->{HTTP_AUTHORIZATION} || '') eq 'Basic '.encode_base64("someuser:somepass", "")) {
+        return [ 200, [], [] ];
+      }
+      return [ 403, [], [] ];
     }
     return [ 200, [], [] ];
   },
@@ -79,5 +86,23 @@ my $th400 = Hello::Tester::HTTP->new(
 );
 
 ok($th400->test->else_done(1)->get, "request with headers was passed correctly");
+
+my $ta = Hello::Tester::HTTP->new(
+  loop     => $loop,
+  id       => "http auth",
+  url      => "http://localhost:$port/auth",
+  username => "someuser",
+  password => "somepass",
+);
+
+ok($ta->test->then_done(1)->get, "request with auth was passed correctly");
+
+my $ta403 = Hello::Tester::HTTP->new(
+  loop     => $loop,
+  id       => "http no auth",
+  url      => "http://localhost:$port/auth",
+);
+
+ok($ta403->test->else_done(1)->get, "request without auth was passed correctly");
 
 done_testing;

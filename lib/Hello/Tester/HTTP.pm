@@ -6,10 +6,12 @@ use strict;
 
 use Moo;
 with 'Hello::Tester';
+with 'Hello::Tester::Role::UsernameAndPassword';
 
 use Types::Standard qw(Str HashRef);
 
 use Net::Async::HTTP;
+use Defined::KV;
 
 sub description { shift->_description }
 has _description => (
@@ -31,6 +33,8 @@ sub test {
   $http->do_request(
     uri => $self->url,
     headers => $self->headers,
+    defined_kv(user => $self->username),
+    defined_kv(pass => $self->password),
   )->then(sub {
     my ($res) = @_;
     $self->loop->remove($http);
