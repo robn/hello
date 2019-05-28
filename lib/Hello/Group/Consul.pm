@@ -13,7 +13,7 @@ use Hello::World;
 
 use Net::Async::Consul;
 
-has service => ( is => 'ro', isa => Str, required => 1 );
+has service => ( is => 'ro', isa => Str );
 has prefix =>  ( is => 'ro', isa => Str );
 
 has all_datacenters => (
@@ -143,17 +143,28 @@ sub _catalog_start {
 
   #$self->logger->log(["starting catalog receiver for %s", $self->datacenter]);
 
-  $self->_catalog->service(
-    $self->group->service,
-    dc => $self->datacenter,
-    index => $self->_catalog_index,
-    wait => '10s',
-    cb => sub { $self->_catalog_change_handler(@_) },
-    error_cb => sub { $self->_catalog_error_handler(@_) },
-  );
+  if ($self->group->service) {
+    $self->_catalog->service(
+      $self->group->service,
+      dc => $self->datacenter,
+      index => $self->_catalog_index,
+      wait => '10s',
+      cb => sub { $self->_catalog_service_change_handler(@_) },
+      error_cb => sub { $self->_catalog_error_handler(@_) },
+    );
+  }
+  else {
+    $self->_catalog->nodes(
+      dc => $self->datacenter,
+      index => $self->_catalog_index,
+      wait => '10s',
+      cb => sub { $self->_catalog_node_change_handler(@_) },
+      error_cb => sub { $self->_catalog_error_handler(@_) },
+    );
+  }
 }
 
-sub _catalog_change_handler {
+sub _catalog_service_change_handler {
   my ($self, $data, $meta) = @_;
 
   # no change, timeout or other thing, just go back to sleep
@@ -174,6 +185,32 @@ sub _catalog_change_handler {
     )
   } @$data;
 
+  $self->_catalog_services(\@services);
+
+  $self->_update_membership;
+
+  $self->_catalog_start;
+}
+
+sub _catalog_node_change_handler {
+  my ($self, $data, $meta) = @_;
+
+  # no change, timeout or other thing, just go back to sleep
+  if ($meta->index == $self->_catalog_index) {
+    $self->_catalog_start;
+    return;
+  }
+
+  $self->logger->log(["catalog change (index %d -> %d)", $self->_catalog_index, $meta->index]);
+  $self->_catalog_index($meta->index);
+
+  my @services = map {
+    Hello::Group::Consul::Service->new(
+      node => $_->name,
+      name => '_node',
+      ip   => $_->address,
+    )
+  } @$data;
   $self->_catalog_services(\@services);
 
   $self->_update_membership;
