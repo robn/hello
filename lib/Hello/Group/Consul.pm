@@ -114,7 +114,7 @@ has _catalog => (
   },
 );
 has _catalog_index    => ( is => 'rw', isa => Int, default => 0);
-has _catalog_services => ( is => 'rw', isa => ArrayRef );
+has _catalog_services => ( is => 'rw', isa => ArrayRef[class_type('Hello::Group::Consul::Service')] );
 
 has _kv => (
   is => 'lazy',
@@ -154,7 +154,7 @@ sub _catalog_start {
 }
 
 sub _catalog_change_handler {
-  my ($self, $services, $meta) = @_;
+  my ($self, $data, $meta) = @_;
 
   # no change, timeout or other thing, just go back to sleep
   if ($meta->index == $self->_catalog_index) {
@@ -164,7 +164,17 @@ sub _catalog_change_handler {
 
   $self->logger->log(["catalog change (index %d -> %d)", $self->_catalog_index, $meta->index]);
   $self->_catalog_index($meta->index);
-  $self->_catalog_services($services);
+
+  my @services = map {
+    Hello::Group::Consul::Service->new(
+      node => $_->node,
+      name => $_->id // $_->name,
+      ip   => $_->address,
+      defined_kv(port => $_->port),
+    )
+  } @$data;
+
+  $self->_catalog_services(\@services);
 
   $self->_update_membership;
 
@@ -258,18 +268,15 @@ sub _update_membership {
   my @member_ids;
 
   for my $service ($services->@*) {
-    my $kv_config =
-      $service_config->{$service->node}->{$service->id} //
-      $service_config->{$service->node}->{$service->name} //
-      {};
+    my $kv_config = $service_config->{$service->node}->{$service->name} // {};
 
     my %config = (
       %$kv_config,
-      ip => $service->service_address || $service->address,
-      ($service->port ? (port => $service->port) : ()),
+      ip => $service->ip,
+      defined_kv(port => $service->port),
     );
 
-    my $member_id = join ':', $self->datacenter, $service->node, $service->id;
+    my $member_id = join ':', $self->datacenter, $service->node, $service->name;
 
     $self->group->add_member(
       Hello::Group::Member->new(
@@ -278,7 +285,7 @@ sub _update_membership {
         tags => {
           dc      => $self->datacenter,
           node    => $service->node,
-          service => $service->id,
+          service => $service->name,
         },
       )
     );
@@ -297,5 +304,20 @@ sub _update_membership {
 
   $self->group->inflate_from_membership;
 }
+
+
+package
+  Hello::Group::Consul::Service;
+
+use 5.020;
+use Moo;
+use experimental qw(postderef);
+
+use Types::Standard qw(Int Str);
+
+has node => ( is => 'ro', isa => Str, required => 1 );
+has name => ( is => 'ro', isa => Str, required => 1 );
+has ip   => ( is => 'ro', isa => Str, required => 1 );
+has port => ( is => 'ro', isa => Int, default  => sub { 0 } );
 
 1;
